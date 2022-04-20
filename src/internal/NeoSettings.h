@@ -25,6 +25,8 @@ License along with NeoPixel.  If not, see
 -------------------------------------------------------------------------*/
 #pragma once
 
+#include <cstdint>
+
 class NeoNoSettings
 {
 };

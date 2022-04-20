@@ -25,7 +25,10 @@ License along with NeoPixel.  If not, see
 -------------------------------------------------------------------------*/
 #pragma once
 
-#include <Arduino.h>
+#include <cstring>
+#include <string>
+
+
 #include "RgbColor.h"
 
 #define MAX_HTML_COLOR_NAME_LEN 21
@@ -44,7 +47,7 @@ License along with NeoPixel.  If not, see
 // ------------------------------------------------------------------------
 struct HtmlColorPair
 {
-    PGM_P Name;
+    const char *Name;
     uint32_t Color;
 };
 
@@ -90,7 +93,7 @@ struct HtmlColor
     // ------------------------------------------------------------------------
     HtmlColor(const RgbColor& color)
     {
-        Color = static_cast<uint32_t>(color.R) << 16 | static_cast<uint32_t>(color.G) << 8 | static_cast<uint32_t>(color.B);
+        Color = (uint32_t)color.R << 16 | (uint32_t)color.G << 8 | (uint32_t)color.B;
     }
 
     // ------------------------------------------------------------------------
@@ -212,17 +215,17 @@ struct HtmlColor
                 for (uint8_t indexName = 0; indexName < T_HTMLCOLORNAMES::Count(); ++indexName)
                 {
                     const HtmlColorPair* colorPair = T_HTMLCOLORNAMES::Pair(indexName);
-                    PGM_P searchName = reinterpret_cast<PGM_P>(pgm_read_ptr(&(colorPair->Name)));
+                    char* searchName = colorPair->Name;
                     size_t str1Size = nameSize;
                     const char* str1 = name;
-                    const char* str2P = searchName;
+                    const char* str2 = searchName;
 
                     uint16_t result;
 
                     while (str1Size > 0)
                     {
                         char ch1 = tolower(*str1++);
-                        char ch2 = tolower(pgm_read_byte(str2P++));
+                        char ch2 = tolower(*str2++);
                         result = ch1 - ch2;
                         if (result != 0 || ch2 == '\0')
                         {
@@ -241,7 +244,7 @@ struct HtmlColor
 
                     if (result == 0)
                     {
-                        Color = pgm_read_dword(&colorPair->Color);
+                        Color = &colorPair->Color;
                         return nameSize - str1Size;
                     }
                 }
@@ -256,7 +259,7 @@ struct HtmlColor
         return Parse<T_HTMLCOLORNAMES>(name, MAX_HTML_COLOR_NAME_LEN + 1);
     }
 
-    template <typename T_HTMLCOLORNAMES> size_t Parse(String const &name)
+    template <typename T_HTMLCOLORNAMES> size_t Parse(std::string const &name)
     { 
         return Parse<T_HTMLCOLORNAMES>(name.c_str(), name.length() + 1);
     }
@@ -283,11 +286,11 @@ struct HtmlColor
         for (uint8_t indexName = 0; indexName < T_HTMLCOLORNAMES::Count(); ++indexName)
         {
             const HtmlColorPair* colorPair = T_HTMLCOLORNAMES::Pair(indexName);
-            if (pgm_read_dword(&colorPair->Color) == Color)
+            if (colorPair->Color == Color)
             {
-                PGM_P name = (PGM_P)pgm_read_ptr(&colorPair->Name);
-                strncpy_P(buf, name, bufSize);
-                return strlen_P(name);
+                char *name = colorPair->Name;
+                strncpy(buf, name, bufSize);
+                return strlen(name);
             }
         }
 

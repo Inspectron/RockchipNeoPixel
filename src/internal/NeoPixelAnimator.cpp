@@ -78,7 +78,7 @@ void NeoPixelAnimator::StartAnimation(uint16_t indexAnimation,
 
     if (_activeAnimations == 0)
     {
-        _animationLastTick = millis();
+        _animationLastTick = (uint32_t) 1000*(clock()/CLOCKS_PER_SEC); //TODO clock method needs to be tested
     }
 
     StopAnimation(indexAnimation);
@@ -123,7 +123,7 @@ void NeoPixelAnimator::UpdateAnimations()
 {
     if (_isRunning)
     {
-        uint32_t currentTick = millis();
+        uint32_t currentTick = (uint32_t) 1000*(clock()/CLOCKS_PER_SEC); //TODO clock method needs to be tested
         uint32_t delta = currentTick - _animationLastTick;
 
         if (delta >= _timeScale)

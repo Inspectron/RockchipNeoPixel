@@ -30,69 +30,42 @@ License along with NeoPixel.  If not, see
 class TwoWireBitBangImple
 {
 public:
-    typedef NeoNoSettings SettingsObject;
+	TwoWireBitBangImple(uint8_t pinClock, uint8_t pinData)
+	{
+        // to avoid warnings
+        pinClock = pinClock;
+        pinData = pinData;
+	}
 
-    TwoWireBitBangImple(uint8_t pinClock, uint8_t pinData) :
-        _pinClock(pinClock),
-        _pinData(pinData)
-    {
-        pinMode(pinClock, OUTPUT);
-        pinMode(pinData, OUTPUT);
-    }
+	~TwoWireBitBangImple()
+	{
+	}
 
-    ~TwoWireBitBangImple()
-    {
-        pinMode(_pinClock, INPUT);
-        pinMode(_pinData, INPUT);
-    }
+	void begin()
+	{
+	}
 
-    void begin()
-    {
-        digitalWrite(_pinClock, LOW);
-        digitalWrite(_pinData, LOW);
-    }
+	void beginTransaction()
+	{
 
-    void beginTransaction()
-    {
+	}
 
-    }
+	void endTransaction()
+	{
+	}
 
-    void endTransaction()
-    {
-        digitalWrite(_pinData, LOW);
-    }
+	void transmitByte(uint8_t data)
+	{
+        // to avoid warnings
+        data = data;
+	}
 
-    void transmitByte(uint8_t data)
-    {
-        for (int bit = 7; bit >= 0; bit--)
-        {
-            // set data bit on pin
-            digitalWrite(_pinData, (data & 0x80) == 0x80 ? HIGH : LOW);
-
-            // set clock high as data is ready
-            digitalWrite(_pinClock, HIGH);
-
-            data <<= 1;
-
-            // set clock low as data pin is changed
-            digitalWrite(_pinClock, LOW);
-        }
-    }
-
-    void transmitBytes(const uint8_t* data, size_t dataSize)
-    {
-        const uint8_t* endData = data + dataSize;
-        while (data < endData)
-        {
-            transmitByte(*data++);
-        }
-    }
-
-    void applySettings(const SettingsObject& settings)
-    {
-    }
+	void transmitBytes(const uint8_t* data, size_t dataSize)
+	{
+        // to avoid warnings
+        data = data;
+        dataSize = dataSize;
+	}
 
 private:
-    const uint8_t  _pinClock;     // output pin number for clock line
-    const uint8_t  _pinData;      // output pin number for data line
 };
