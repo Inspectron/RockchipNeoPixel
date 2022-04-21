@@ -26,9 +26,13 @@ License along with NeoPixel.  If not, see
 
 #pragma once
 
-//#include <SPI.h>
-#include <iostream>
-using namespace std;
+#include "SPIHandler.h"
+
+// anonymous namespace
+namespace
+{
+    const char* SPI_DEV_FILENAME = "/sys/class/spidev";  //TODO need to think how this can be done as arg
+}
 
 class SpiSpeed40Mhz
 {
@@ -57,49 +61,40 @@ public:
 template<typename T_SPISPEED> class TwoWireSpiImple
 {
 public:
-	TwoWireSpiImple(uint8_t, uint8_t) // clock and data pins ignored for hardware SPI
+	TwoWireSpiImple(uint8_t, uint8_t): // clock and data pins ignored for hardware SPI
+    mSPIHandler(*new SPIHandler())
 	{
 	}
 
 	~TwoWireSpiImple()
 	{
-		//SPI.end();
-        cout << "SPI.end()";
+        mSPIHandler.end();
+        delete &mSPIHandler;
 	}
 
 	void begin()
 	{
-		//SPI.begin();
-        cout << "SPI.begin()";
+        mSPIHandler.begin(SPI_DEV_FILENAME, T_SPISPEED::Clock);
 	}
 
 	void beginTransaction()
 	{
-		//SPI.beginTransaction(SPISettings(T_SPISPEED::Clock, MSBFIRST, SPI_MODE0));
-        cout << "SPI.beginTransaction()";
 	}
 
 	void endTransaction()
 	{
-		//SPI.endTransaction();
-        cout << "SPI.endTransaction()";
 	}
 
 	void transmitByte(uint8_t data)
 	{
-		//SPI.transfer(data);
-        cout << "SPI.transfer(data)";
+        transmitBytes(&data, 1);
 	}
 
-	void transmitBytes(const uint8_t* data, size_t dataSize)
+	void transmitBytes(uint8_t* data, size_t dataSize)
 	{
-		const uint8_t* endData = data + dataSize;
-		while (data < endData)
-		{
-			//SPI.transfer(*data++);
-            cout << "SPI.transfer(*data++)";
-		}
+        mSPIHandler.transfer(data, dataSize);
 	}
 
 private:
+    SPIHandler mSPIHandler;
 };

@@ -31,6 +31,7 @@ HEADERS += $$PWD/NeoPixelAnimator.h \
         $$PWD/internal/NeoTopology.h \
         $$PWD/internal/RgbColor.h \
         $$PWD/internal/RgbwColor.h \
+        $$PWD/internal/SPIHandler.h \
 
 SOURCES += $$PWD/internal/NeoPixelAnimator.cpp \
         $$PWD/internal/Esp32_i2s.c \
@@ -44,3 +45,4 @@ SOURCES += $$PWD/internal/NeoPixelAnimator.cpp \
         $$PWD/internal/NeoPixelAvr.c \
         $$PWD/internal/RgbColor.cpp \
         $$PWD/internal/RgbwColor.cpp \
+        $$PWD/internal/SPIHandler.cpp \
