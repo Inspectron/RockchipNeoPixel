@@ -64,19 +64,6 @@ public:
         }
     }
 
-    static void movePixelsInc_P(uint8_t* pPixelDest, PGM_VOID_P pPixelSrc, uint16_t count)
-    {
-        uint8_t* pEnd = pPixelDest + (count * PixelSize);
-        const uint8_t* pSrc = (const uint8_t*)pPixelSrc;
-        while (pPixelDest < pEnd)
-        {
-            *pPixelDest++ = pgm_read_byte(pSrc++);
-            *pPixelDest++ = pgm_read_byte(pSrc++);
-            *pPixelDest++ = pgm_read_byte(pSrc++);
-            *pPixelDest++ = pgm_read_byte(pSrc++);
-        }
-    }
-
     static void movePixelsDec(uint8_t* pPixelDest, const uint8_t* pPixelSrc, uint16_t count)
     {
         uint8_t* pDestBack = pPixelDest + (count * PixelSize);
@@ -128,19 +115,6 @@ public:
             *pPixelDest++ = *pPixelSrc++;
             *pPixelDest++ = *pPixelSrc++;
             *pPixelDest++ = *pPixelSrc++;
-        }
-    }
-
-    static void movePixelsInc_P(uint8_t* pPixelDest, PGM_VOID_P pPixelSrc, uint16_t count)
-    {
-        uint8_t* pEnd = pPixelDest + (count * PixelSize);
-        const uint8_t* pSrc = (const uint8_t*)pPixelSrc;
-        while (pPixelDest < pEnd)
-        {
-            *pPixelDest++ = pgm_read_byte(pSrc++);
-            *pPixelDest++ = pgm_read_byte(pSrc++);
-            *pPixelDest++ = pgm_read_byte(pSrc++);
-            *pPixelDest++ = pgm_read_byte(pSrc++);
         }
     }
 
@@ -210,7 +184,7 @@ public:
     {
         uint8_t* p = getPixelAddress(pPixels, indexPixel);
 
-        *p++ = 0xff; // upper three bits are always 111 and brightness at max
+        *p++ = 0xE3; // upper three bits are always 111 and brightness at max
         *p++ = color.B;
         *p++ = color.G;
         *p = color.R;
@@ -228,20 +202,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        pgm_read_byte(p++); // ignore the first byte
-        color.B = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 
 class DotStarLbgrFeature : public DotStar4ElementsNoSettings
@@ -269,20 +229,6 @@ public:
 
         return color;
     }
-    
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        color.W = pgm_read_byte(p++) & 0x1F; // mask out upper three bits
-        color.B = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p);
-
-        return color;
-    }
-    
 };
 
 class DotStarGrbFeature : public DotStar3ElementsNoSettings
@@ -310,20 +256,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        pgm_read_byte(p++); // ignore the first byte
-        color.G = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 
 class DotStarLgrbFeature : public DotStar4ElementsNoSettings
@@ -351,20 +283,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        color.W = pgm_read_byte(p++) & 0x1F; // mask out upper three bits
-        color.G = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 
 /* RGB Feature -- Some APA102s ship in RGB order */
@@ -393,20 +311,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        pgm_read_byte(p++); // ignore the first byte
-        color.R = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 
 class DotStarLrgbFeature : public DotStar4ElementsNoSettings
@@ -434,20 +338,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        color.W = pgm_read_byte(p++) & 0x1F; // mask out upper three bits
-        color.R = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 /* RBG Feature -- Some APA102s ship in RBG order */
 class DotStarRbgFeature : public DotStar3ElementsNoSettings
@@ -475,20 +365,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        pgm_read_byte(p++); // ignore the first byte
-        color.R = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 
 class DotStarLrbgFeature : public DotStar4ElementsNoSettings
@@ -516,20 +392,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        color.W = pgm_read_byte(p++) & 0x1F; // mask out upper three bits
-        color.R = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 
 /* GBR Feature -- Some APA102s ship in GBR order */
@@ -558,20 +420,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        pgm_read_byte(p++); // ignore the first byte
-        color.G = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 
 class DotStarLgbrFeature : public DotStar4ElementsNoSettings
@@ -599,20 +447,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        color.W = pgm_read_byte(p++) & 0x1F; // mask out upper three bits
-        color.G = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 /* BRG Feature -- Some APA102s ship in BRG order */
 class DotStarBrgFeature : public DotStar3ElementsNoSettings
@@ -640,20 +474,6 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        pgm_read_byte(p++); // ignore the first byte
-        color.B = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p);
-
-        return color;
-    }
-
 };
 
 class DotStarLbrgFeature : public DotStar4ElementsNoSettings
@@ -681,18 +501,4 @@ public:
 
         return color;
     }
-
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        color.W = pgm_read_byte(p++) & 0x1F; // mask out upper three bits
-        color.B = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p);
-
-        return color;
-    }
-
 };

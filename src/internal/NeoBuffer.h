@@ -144,10 +144,11 @@ public:
 
         for (uint16_t indexPixel = 0; indexPixel < countPixels; indexPixel++)
         {
-            const uint8_t* pSrc = T_BUFFER_METHOD::ColorFeature::getPixelAddress(_method.Pixels(), indexPixel);
-            uint8_t* pDest = T_BUFFER_METHOD::ColorFeature::getPixelAddress(destBuffer.Pixels, indexPixel);
+            typename T_BUFFER_METHOD::ColorObject color;
+            
+            shader.Apply(indexPixel, (uint8_t*)(&color), _method.Pixels() + (indexPixel * _method.PixelSize()));
 
-            shader.Apply(indexPixel, pDest, pSrc);
+            T_BUFFER_METHOD::ColorFeature::applyPixelColor(destBuffer.Pixels, indexPixel, color);
         }
     }
 
@@ -161,9 +162,9 @@ private:
         uint16_t result = PixelIndex_OutOfBounds;
 
         if (x >= 0 &&
-            static_cast<uint16_t>(x) < Width() &&
+            (uint16_t)x < Width() &&
             y >= 0 &&
-            static_cast<uint16_t>(y) < Height())
+            (uint16_t)y < Height())
         {
             result = x + y * Width();
         }

@@ -26,8 +26,9 @@ License along with NeoPixel.  If not, see
 
 #pragma once
 
-#include <Arduino.h>
+
 #include "internal/NeoEase.h"
+#include <time.h>
 
 enum AnimationState
 {
@@ -43,19 +44,11 @@ struct AnimationParam
     AnimationState state;
 };
 
-#if defined(NEOPIXEBUS_NO_STL)
-
-typedef void(*AnimUpdateCallback)(const AnimationParam& param);
-
-#else
 
 #undef max
 #undef min
 #include <functional>
 typedef std::function<void(const AnimationParam& param)> AnimUpdateCallback;
-
-#endif
-
 
 #define NEO_MILLISECONDS        1    // ~65 seconds max duration, ms updates
 #define NEO_CENTISECONDS       10    // ~10.9 minutes max duration, centisecond updates
@@ -126,7 +119,7 @@ public:
     void Resume()
     {
         _isRunning = true;
-        _animationLastTick = millis();
+        _animationLastTick = (uint32_t) 1000*(clock()/CLOCKS_PER_SEC); //TODO clock method needs to be tested
     }
 
     uint16_t getTimeScale()

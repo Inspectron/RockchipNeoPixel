@@ -27,7 +27,7 @@ License along with NeoPixel.  If not, see
 #include "HtmlColor.h"
 #include "HtmlColorNameStrings.h"
 
-static const HtmlColorPair c_ColorNames[] PROGMEM = {
+static const HtmlColorPair c_ColorNames[]  ={
     { c_HtmlNameAliceBlue, 0xf0f8ff },
     { c_HtmlNameAntiqueWhite, 0xfaebd7 },
     { c_HtmlNameAqua, 0xffff },

@@ -152,9 +152,9 @@ private:
 
         if (indexSprite < _spriteCount &&
             x >= 0 &&
-            static_cast<uint16_t>(x) < SpriteWidth() &&
+            (uint16_t)x < SpriteWidth() &&
             y >= 0 &&
-            static_cast<uint16_t>(y) < SpriteHeight())
+            (uint16_t)y < SpriteHeight())
         {
             result = x + y * SpriteWidth() + indexSprite * _spriteHeight * SpriteWidth();
         }

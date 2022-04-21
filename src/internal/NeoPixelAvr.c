@@ -36,7 +36,7 @@ License along with NeoPixel.  If not, see
 // must also check for arm due to Teensy incorrectly having ARDUINO_ARCH_AVR set
 #if (defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)) && !defined(__arm__)
 
-#include <Arduino.h>
+
 
 // Hand-tuned assembly code issues data to the LED drivers at a specific
 // rate.  There's separate code for different CPU speeds (8, 12, 16 MHz)

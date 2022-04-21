@@ -25,18 +25,21 @@ License along with NeoPixel.  If not, see
 -------------------------------------------------------------------------*/
 #pragma once
 
-#include <Arduino.h>
-#include "NeoSettings.h"
-#include "RgbColorBase.h"
 
-struct RgbwColor;
+#include <cstdint>
+
+#include "NeoSettings.h"
+
+struct HslColor;
+struct HsbColor;
+struct HtmlColor;
 
 // ------------------------------------------------------------------------
 // RgbColor represents a color object that is represented by Red, Green, Blue
 // component values.  It contains helpful color routines to manipulate the 
 // color.
 // ------------------------------------------------------------------------
-struct RgbColor : RgbColorBase
+struct RgbColor
 {
     typedef NeoRgbCurrentSettings SettingsObject;
 
@@ -59,16 +62,6 @@ struct RgbColor : RgbColorBase
     };
 
     // ------------------------------------------------------------------------
-    // explicitly Construct a RgbColor using RgbwColor
-    // ------------------------------------------------------------------------
-    explicit RgbColor(const RgbwColor& color);
-
-    // ------------------------------------------------------------------------
-    // Construct a RgbColor using Rgb16Color
-    // ------------------------------------------------------------------------
-    RgbColor(const Rgb16Color& color);
-
-    // ------------------------------------------------------------------------
     // Construct a RgbColor using HtmlColor
     // ------------------------------------------------------------------------
     RgbColor(const HtmlColor& color);
@@ -82,7 +75,6 @@ struct RgbColor : RgbColorBase
     // Construct a RgbColor using HsbColor
     // ------------------------------------------------------------------------
     RgbColor(const HsbColor& color);
-
 
     // ------------------------------------------------------------------------
     // Construct a RgbColor that will have its values set in latter operations
@@ -170,9 +162,9 @@ struct RgbColor : RgbColorBase
     {
         auto total = 0;
 
-        total += R * settings.RedTenthMilliAmpere / Max;
-        total += G * settings.GreenTenthMilliAmpere / Max;
-        total += B * settings.BlueTenthMilliAmpere / Max;
+        total += R * settings.RedTenthMilliAmpere / 255;
+        total += G * settings.GreenTenthMilliAmpere / 255;
+        total += B * settings.BlueTenthMilliAmpere / 255;
 
         return total;
     }
@@ -185,26 +177,21 @@ struct RgbColor : RgbColorBase
     uint8_t G;
     uint8_t B;
 
-    const static uint8_t Max = 255;
-
 private:
     inline static uint8_t _elementDim(uint8_t value, uint8_t ratio)
     {
-        return (static_cast<uint16_t>(value) * (static_cast<uint16_t>(ratio) + 1)) >> 8;
+        return (value * (ratio + 1)) >> 8;
     }
 
     inline static uint8_t _elementBrighten(uint8_t value, uint8_t ratio)
     { 
-        uint16_t element = ((static_cast<uint16_t>(value) + 1) << 8) / (static_cast<uint16_t>(ratio) + 1);
+        uint16_t element = (value << 8) / (ratio + 1);
 
-        if (element > Max)
+        if (element > 255)
         {
-            element = Max;
+            element = 255;
         }
-        else
-        {
-            element -= 1;
-        }
+
         return element;
     }
 };

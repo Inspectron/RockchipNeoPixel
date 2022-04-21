@@ -25,7 +25,7 @@ License along with NeoPixel.  If not, see
 -------------------------------------------------------------------------*/
 #pragma once
 
-#include <Arduino.h>
+
 
 struct RgbColor;
 struct HslColor;
@@ -187,10 +187,10 @@ struct RgbwColor
     {
         auto total = 0;
 
-        total += R * settings.RedTenthMilliAmpere / Max;
-        total += G * settings.GreenTenthMilliAmpere / Max;
-        total += B * settings.BlueTenthMilliAmpere / Max;
-        total += W * settings.WhiteCurrent / Max;
+        total += R * settings.RedTenthMilliAmpere / 255;
+        total += G * settings.GreenTenthMilliAmpere / 255;
+        total += B * settings.BlueTenthMilliAmpere / 255;
+        total += W * settings.WhiteCurrent / 255;
 
         return total;
     }
@@ -205,26 +205,21 @@ struct RgbwColor
     uint8_t B;
     uint8_t W;
 
-    const static uint8_t Max = 255;
-
 private:
     inline static uint8_t _elementDim(uint8_t value, uint8_t ratio)
     {
-        return (static_cast<uint16_t>(value) * (static_cast<uint16_t>(ratio) + 1)) >> 8;
+        return (value * (ratio + 1)) >> 8;
     }
 
     inline static uint8_t _elementBrighten(uint8_t value, uint8_t ratio)
     {
-        uint16_t element = ((static_cast<uint16_t>(value) + 1) << 8) / (static_cast<uint16_t>(ratio) + 1);
+        uint16_t element = (value << 8) / (ratio + 1);
 
-        if (element > Max)
+        if (element > 255)
         {
-            element = Max;
+            element = 255;
         }
-        else
-        {
-            element -= 1;
-        }
+
         return element;
     }
 };

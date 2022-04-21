@@ -30,89 +30,34 @@ License along with NeoPixel.  If not, see
 class TwoWireBitBangImple
 {
 public:
-    typedef NeoNoSettings SettingsObject;
+	TwoWireBitBangImple(uint8_t pinClock, uint8_t pinData)
+	{
+	}
 
-    TwoWireBitBangImple(uint8_t pinClock, uint8_t pinData) :
-        _pinClock(pinClock),
-        _pinData(pinData)
-    {
-        pinMode(pinClock, OUTPUT);
-        pinMode(pinData, OUTPUT);
+	~TwoWireBitBangImple()
+	{
+	}
 
-        _portClock = portOutputRegister(digitalPinToPort(_pinClock));
-        _pinMaskClock = digitalPinToBitMask(_pinClock);
-        _portData = portOutputRegister(digitalPinToPort(_pinData));
-        _pinMaskData = digitalPinToBitMask(_pinData);
-    }
+	void begin()
+	{
+	}
 
-    ~TwoWireBitBangImple()
-    {
-        pinMode(_pinClock, INPUT);
-        pinMode(_pinData, INPUT);
-    }
+	void beginTransaction()
+	{
 
-    void begin()
-    {
-        digitalWrite(_pinClock, LOW);
-        digitalWrite(_pinData, LOW);
-    }
+	}
 
-    void beginTransaction()
-    {
+	void endTransaction()
+	{
+	}
 
-    }
+	void transmitByte(uint8_t data)
+	{
+	}
 
-    void endTransaction()
-    {
-        digitalWrite(_pinData, LOW);
-    }
-
-    void transmitByte(uint8_t data)
-    {
-        for (int bit = 7; bit >= 0; bit--)
-        {
-            // set data bit on pin
-            // digitalWrite(_pinData, (data & 0x80) == 0x80 ? HIGH : LOW);
-            if (data & 0x80)
-            {
-                *_portData |= _pinMaskData;
-            }
-            else
-            {
-                *_portData &= ~_pinMaskData;
-            }
-
-            // set clock high as data is ready
-            // digitalWrite(_pinClock, HIGH);
-            *_portClock |= _pinMaskClock;
-
-            data <<= 1;
-
-            // set clock low as data pin is changed
-            // digitalWrite(_pinClock, LOW);
-            *_portClock &= ~_pinMaskClock;
-        }
-    }
-
-    void transmitBytes(const uint8_t* data, size_t dataSize)
-    {
-        const uint8_t* endData = data + dataSize;
-        while (data < endData)
-        {
-            transmitByte(*data++);
-        }
-    }
-
-    void applySettings(const SettingsObject& settings)
-    {
-    }
+	void transmitBytes(const uint8_t* data, size_t dataSize)
+	{
+	}
 
 private:
-    const uint8_t  _pinClock;     // output pin number for clock line
-    const uint8_t  _pinData;      // output pin number for data line
-
-    volatile uint8_t* _portData;  // Output PORT register
-    uint8_t  _pinMaskData;        // Output PORT bitmask
-    volatile uint8_t* _portClock;  // Output PORT register
-    uint8_t  _pinMaskClock;        // Output PORT bitmask
 };

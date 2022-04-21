@@ -27,7 +27,7 @@ License along with NeoPixel.  If not, see
 #include "HtmlColor.h"
 #include "HtmlColorNameStrings.h"
 
-static const HtmlColorPair c_ShortColorNames[] PROGMEM = {
+static const HtmlColorPair c_ShortColorNames[]  ={
     { c_HtmlNameAqua, 0xffff },
     { c_HtmlNameBlack, 0x0 },
     { c_HtmlNameBlue, 0xff },

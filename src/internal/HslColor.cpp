@@ -26,11 +26,16 @@ License along with NeoPixel.  If not, see
 -------------------------------------------------------------------------*/
 
 #include "RgbColor.h"
-#include "Rgb48Color.h"
 #include "HslColor.h"
 
-void HslColor::_RgbToHsl(float r, float g, float b, HslColor* color)
+
+HslColor::HslColor(const RgbColor& color)
 {
+    // convert colors to float between (0.0 - 1.0)
+    float r = color.R / 255.0f;
+    float g = color.G / 255.0f;
+    float b = color.B / 255.0f;
+
     float max = (r > g && r > b) ? r : (g > b) ? g : b;
     float min = (r < g && r < b) ? r : (g < b) ? g : b;
 
@@ -61,27 +66,7 @@ void HslColor::_RgbToHsl(float r, float g, float b, HslColor* color)
         h /= 6.0f;
     }
 
-    color->H = h;
-    color->S = s;
-    color->L = l;
-}
-
-HslColor::HslColor(const RgbColor& color)
-{
-    // convert colors to float between (0.0 - 1.0)
-    float r = color.R / 255.0f;
-    float g = color.G / 255.0f;
-    float b = color.B / 255.0f;
-
-    _RgbToHsl(r, g, b, this);
-}
-
-HslColor::HslColor(const Rgb48Color& color)
-{
-    // convert colors to float between (0.0 - 1.0)
-    float r = color.R / 65535.0f;
-    float g = color.G / 65535.0f;
-    float b = color.B / 65535.0f;
-
-    _RgbToHsl(r, g, b, this);
+    H = h;
+    S = s;
+    L = l;
 }

@@ -51,7 +51,7 @@ public:
     }
 };
 
-class Neo4ByteElementsTm1814Settings : public Neo4ByteElements
+class Neo4ElementsTm1814Settings : public Neo4Elements
 {
 public:
     typedef NeoTm1814Settings SettingsObject;
@@ -83,12 +83,12 @@ public:
 
     static const uint8_t* pixels(const uint8_t* pData)
     {
-        return pData + SettingsSize;
+        return pData;
     }
 };
 
 
-class NeoWrgbTm1814Feature : public Neo4ByteElementsTm1814Settings
+class NeoWrgbTm1814Feature : public Neo4ElementsTm1814Settings
 {
 public:
     static void applyPixelColor(uint8_t* pPixels, uint16_t indexPixel, ColorObject color)
@@ -113,19 +113,5 @@ public:
 
         return color;
     }
-    
-    static ColorObject retrievePixelColor_P(PGM_VOID_P pPixels, uint16_t indexPixel)
-    {
-        ColorObject color;
-        const uint8_t* p = getPixelAddress((const uint8_t*)pPixels, indexPixel);
-
-        color.W = pgm_read_byte(p++);
-        color.R = pgm_read_byte(p++);
-        color.G = pgm_read_byte(p++);
-        color.B = pgm_read_byte(p);
-
-        return color;
-    }
-    
 };
 
