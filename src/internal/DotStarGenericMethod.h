@@ -28,10 +28,8 @@ License along with NeoPixel.  If not, see
 
 #include "TwoWireBitBangImple.h"
 
-// for test
-#define SS    8
+//TODO remove these once Linux SPI tested and works OK
 #define MOSI  9
-#define MISO  10
 #define SCK   11
 
 
