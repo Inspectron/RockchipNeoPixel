@@ -67,7 +67,7 @@ public:
 
     void Update(bool)
     {
-		const uint8_t startFrame[4] = { 0x00 };
+		uint8_t startFrame[4] = { 0x00 };
 		uint8_t resetFrame[4] = { 0xff };
 		memset(resetFrame, 0xff, sizeof(resetFrame));
 		_wire.beginTransaction();

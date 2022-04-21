@@ -43,7 +43,7 @@ SPIHandler::~SPIHandler()
  * @return           1  if success
  *                  -1  if error
  */
-int SPIHandler::begin(char* spiFilename, uint32_t speed)
+int SPIHandler::begin(const char* spiFilename, uint32_t speed)
 {
     mSpeed = speed;
 
