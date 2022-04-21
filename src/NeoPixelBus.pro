@@ -7,6 +7,7 @@ HEADERS += $$PWD/NeoPixelAnimator.h \
         $$PWD/NeoPixelBrightnessBus.h \
         $$PWD/NeoPixelBus.h \
         $$PWD/NeoPixelSegmentBus.h \
+        $$PWD/internal/SPIHandler.h \
         $$PWD/internal/DotStarColorFeatures.h \
         $$PWD/internal/DotStarGenericMethod.h \
         $$PWD/internal/Esp32_i2s.h \
@@ -31,10 +32,11 @@ HEADERS += $$PWD/NeoPixelAnimator.h \
         $$PWD/internal/NeoTopology.h \
         $$PWD/internal/RgbColor.h \
         $$PWD/internal/RgbwColor.h \
-        $$PWD/internal/SPIHandler.h \
+
 
 SOURCES += $$PWD/internal/NeoPixelAnimator.cpp \
         $$PWD/internal/Esp32_i2s.c \
+        $$PWD/internal/SPIHandler.cpp \
         $$PWD/internal/HsbColor.cpp \
         $$PWD/internal/HslColor.cpp \
         $$PWD/internal/HtmlColor.cpp \
@@ -45,4 +47,3 @@ SOURCES += $$PWD/internal/NeoPixelAnimator.cpp \
         $$PWD/internal/NeoPixelAvr.c \
         $$PWD/internal/RgbColor.cpp \
         $$PWD/internal/RgbwColor.cpp \
-        $$PWD/internal/SPIHandler.cpp \
