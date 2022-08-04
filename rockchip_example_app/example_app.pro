@@ -6,13 +6,9 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/LEDHandler.hpp \
-    $$PWD/LEDTypes.h \
-    include/NeoPixelAnimator.h \
-    include/NeoPixelBrightnessBus.h \
-    include/NeoPixelBus.h \
-    include/NeoPixelSegmentBus.h
+    $$PWD/LEDTypes.h
 
-INCLUDEPATH  += include
+INCLUDEPATH  += ../src
 
 unix {
     LIBS += -L$$PWD/lib -lNeoPixelBus
