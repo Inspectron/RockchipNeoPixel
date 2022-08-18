@@ -27,10 +27,11 @@ License along with NeoPixel.  If not, see
 #pragma once
 
 #include "TwoWireBitBangImple.h"
+#include <QDebug>
 
 //TODO remove these once Linux SPI tested and works OK
-#define MOSI  9
-#define SCK   11
+#define MOSI  9//spi0mosi/gpio10/19 ue
+#define SCK   11//spi0sclk/gpio11/23 ue
 
 
 template<typename T_TWOWIRE> class DotStarMethodBase
@@ -41,14 +42,17 @@ public:
 		_sizeEndFrame((pixelCount + 15) / 16), // 16 = div 2 (bit for every two pixels) div 8 (bits to bytes)
 		_wire(pinClock, pinData)
     {
+        qDebug()<<__LINE__<<pinClock<<pinData;
         _data = static_cast<uint8_t*>(malloc(_sizeData));
         memset(_data, 0, _sizeData);
     }
 
-	DotStarMethodBase(uint16_t pixelCount, size_t elementSize, size_t settingsSize) :
-		DotStarMethodBase(SCK, MOSI, pixelCount, elementSize, settingsSize)
-	{
-	}
+    DotStarMethodBase(uint16_t pixelCount, size_t elementSize, size_t settingsSize) :
+        DotStarMethodBase(SCK, MOSI, pixelCount, elementSize, settingsSize)
+    {
+    //ue
+        qDebug()<<__LINE__;
+    }
 
     ~DotStarMethodBase()
     {
@@ -74,20 +78,21 @@ public:
 
         // start frame
 		_wire.transmitBytes(startFrame, sizeof(startFrame));
-        
+        //qDebug()<<__LINE__;
         // data
 		_wire.transmitBytes(_data, _sizeData);
-
+        //qDebug()<<__LINE__;
        // reset frame
 		_wire.transmitBytes(resetFrame, sizeof(resetFrame));
-        
+        //qDebug()<<__LINE__;
         // end frame 
-        
+        //qDebug()<<__LINE__;
 		// one bit for every two pixels with no less than 1 byte
-// 		for (size_t endFrameByte = 0; endFrameByte < _sizeEndFrame; endFrameByte++)
-// 		{
-// 			_wire.transmitByte(0x00);
-// 		}
+        // comment 3 lines of code
+//        for (size_t endFrameByte = 0; endFrameByte < _sizeEndFrame; endFrameByte++)
+//        {
+//            _wire.transmitByte(0x00);
+//        }
 		
 		_wire.endTransaction();
     }
