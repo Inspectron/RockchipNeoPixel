@@ -87,6 +87,11 @@ public:
 	void setPowerLEDOn(bool isOn);
 	
 	void turnOffAllLEDs(bool isChargeLightOn=false);
+
+    //Set leds to required color
+    void setLed(uint16_t &index, RgbColor &color);
+    void setLed(QVector<uint16_t> &index, RgbColor &color);
+    void setLed(QVector<uint16_t> &index, QVector<RgbColor> &color);
 	
 	//status indicators
 	void setLEDBatteryStatusState(uint8_t state);

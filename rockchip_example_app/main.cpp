@@ -6,13 +6,15 @@ using namespace LEDHANDLER;
 
 LEDHandler* pLEDHandler;
 
+#define DBG 0
+
 
 int main()
 {
 
     InspCore::setFormattedDebugOutput("Led App");
-    qDebug()<<__LINE__;
-#if 1
+#if DBG
+
     pLEDHandler = new LEDHandler();
 
     // spi dev filename const is in ../src/internal/TwoWireSpiImple.h
@@ -21,7 +23,6 @@ int main()
     pLEDHandler->startSpi();
 
     pLEDHandler->turnOffAllLEDs();
-    pLEDHandler->testLights();
 
     // test states of some leds
     pLEDHandler->setLEDState(eLED_STATE_LASER_DOT_ON);
@@ -32,51 +33,53 @@ int main()
 
     // test battery led blinking
     pLEDHandler->setLEDBatteryStatusState(eLED_BATTERY_CHARGING);
-    pLEDHandler->testLights();
-    
+
+#else
+    pLEDHandler = new LEDHandler();
+    RgbColor CGN      (  0, 255,   0);
+    RgbColor CGN1      (  0, 255,   255);
+    RgbColor CGN2      (  255, 0,   0);
+    RgbColor CGN3      (  255, 255,   0);
+    uint16_t radio = 6;
+    uint16_t radio1 = 7;
+    uint16_t radio2 = 8;
+    uint16_t radio3 = 9;
+    uint16_t radio4 = 10;
+    uint16_t radio5 = 11;
+    uint16_t radio6 = 12;
+    uint16_t radio7 = 13;
+    uint16_t radio8 = 14;
+    uint16_t radio9 = 15;
+    uint16_t radio10 = 16;
+    uint16_t radio11 = 17;
+    uint16_t radio12 = 18;
+    uint16_t radio13 = 19;
+    uint16_t radio14 = 20;
+
+    QVector<uint16_t> vec = {0,1,2,3};
+    QVector<RgbColor> veccolor = {CGN,CGN1,CGN2,CGN3};
+    //test 1
+    pLEDHandler->setLed(radio,CGN);
+    pLEDHandler->setLed(radio1,CGN1);
+    pLEDHandler->setLed(radio2,CGN2);
+    pLEDHandler->setLed(radio3,CGN);
+    pLEDHandler->setLed(radio4,CGN1);
+    pLEDHandler->setLed(radio5,CGN1);
+    pLEDHandler->setLed(radio6,CGN2);
+    pLEDHandler->setLed(radio7,CGN2);
+    pLEDHandler->setLed(radio8,CGN);
+    pLEDHandler->setLed(radio9,CGN);
+    pLEDHandler->setLed(radio10,CGN1);
+    pLEDHandler->setLed(radio11,CGN);
+    pLEDHandler->setLed(radio12,CGN2);
+    pLEDHandler->setLed(radio13,CGN1);
+    pLEDHandler->setLed(radio14,CGN1);
+    //test 2
+    pLEDHandler->setLed(vec,CGN);
+    //test 3
+    while(1){
+        pLEDHandler->setLed(vec,veccolor);
+    }
 #endif
-
-#if 0
-    const uint16_t pixels = 22;
-    const RgbColor COLOR_RED        (255,   0,   0);
-    const RgbColor COLOR_BLUE       (  0,   0, 255);
-    const RgbColor COLOR_GREEN      (  0, 255,   0);
-    const RgbColor COLOR_LIGHT_GREEN ( 19, 255,  15);
-    const RgbColor COLOR_WHITE      (255, 255, 255);
-    const RgbColor COLOR_BLACK      (  0,   0,   0);
-    const RgbColor COLOR_YELLOW     (255, 255,   0);
-    const RgbColor COLOR_PURPLE     (255,   0, 255);
-    const RgbColor COLOR_ORANGE     (255, 50,   0);
-
-    NeoPixelBus<DotStarBgrFeature, DotStarSpi2MhzMethod> mTrial(pixels);
-    mTrial.Begin();
-    mTrial.ClearTo(COLOR_BLACK);
-    mTrial.Show();
-
-    mTrial.SetPixelColor(1, COLOR_RED);
-    mTrial.SetPixelColor(2, COLOR_GREEN);
-    mTrial.SetPixelColor(3, COLOR_ORANGE);
-    mTrial.SetPixelColor(4, COLOR_BLUE);
-    mTrial.SetPixelColor(5, COLOR_GREEN);
-    mTrial.SetPixelColor(6, COLOR_ORANGE);
-    mTrial.SetPixelColor(7, COLOR_RED);
-    mTrial.SetPixelColor(8, COLOR_BLUE);
-    mTrial.SetPixelColor(9, COLOR_GREEN);
-    mTrial.SetPixelColor(10, COLOR_ORANGE);
-    mTrial.SetPixelColor(11, COLOR_RED);
-    mTrial.SetPixelColor(12, COLOR_PURPLE);
-    mTrial.SetPixelColor(13, COLOR_GREEN);
-    mTrial.SetPixelColor(14, COLOR_PURPLE);
-    mTrial.SetPixelColor(15, COLOR_RED);
-    mTrial.SetPixelColor(16, COLOR_PURPLE);
-    mTrial.SetPixelColor(17, COLOR_GREEN);
-    mTrial.SetPixelColor(18, COLOR_PURPLE);
-    mTrial.SetPixelColor(19, COLOR_RED);
-    mTrial.SetPixelColor(20, COLOR_PURPLE);
-    //processBlendedAnimationForever(0, PIXEL_COUNT, ONE_SECOND_DURATION, 3, RGBTestColors);
-    mTrial.Show();
-#endif
-
-
     return 0;
 }

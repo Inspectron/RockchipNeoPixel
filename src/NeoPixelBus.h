@@ -89,7 +89,6 @@ public:
         _state(0),
         _method(pin, countPixels, T_COLOR_FEATURE::PixelSize, T_COLOR_FEATURE::SettingsSize)
     {
-        qDebug()<<__LINE__;
     }
 
     NeoPixelBus(uint16_t countPixels, uint8_t pinClock, uint8_t pinData) :
@@ -97,15 +96,13 @@ public:
         _state(0),
         _method(pinClock, pinData, countPixels, T_COLOR_FEATURE::PixelSize, T_COLOR_FEATURE::SettingsSize)
     {
-        qDebug()<<__LINE__;
     }
 
     NeoPixelBus(uint16_t countPixels) :
         _countPixels(countPixels),
         _state(0),
         _method(countPixels, T_COLOR_FEATURE::PixelSize, T_COLOR_FEATURE::SettingsSize)
-    {
-        qDebug()<<__LINE__;
+    {       
     }
 
     ~NeoPixelBus()
@@ -120,17 +117,13 @@ public:
 
     void Begin()
     {
-    //ue
-        qDebug()<<__LINE__;
         _method.Initialize();
-        //ClearTo(0);
         Dirty();
     }
 
     // used by DotStartSpiMethod if pins can be configured
     void Begin(int8_t sck, int8_t miso, int8_t mosi, int8_t ss)
     {
-        qDebug()<<__LINE__;
         _method.Initialize(sck, miso, mosi, ss);
         Dirty();
     }
