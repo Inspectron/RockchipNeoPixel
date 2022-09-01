@@ -1,5 +1,6 @@
 #include "LEDHandler.hpp"
 #include "inspcore.hpp"
+#include <QVector>
 
 
 using namespace LEDHANDLER;

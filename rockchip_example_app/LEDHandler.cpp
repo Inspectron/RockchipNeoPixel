@@ -1,6 +1,7 @@
 #include "LEDHandler.hpp"
 #include <time.h>
-#include <QVector>
+#include <QDebug>
+
 
 using namespace LEDTypes;
 using namespace LEDHANDLER;
@@ -135,25 +136,9 @@ void LEDHandler::startSpi()
 
 void LEDHandler::testLights()
 {
-//ue
-//    mPixelStrip.Begin();
-//    mPixelStrip.ClearTo(COLOR_BLACK);
-//    mPixelStrip.Show();
-    //processBlendedAnimationForever(0, PIXEL_COUNT, ONE_SECOND_DURATION, 3, RGBTestColors);
-    mPixelStrip.SetPixelColor(19, COLOR_YELLOW);
-    mPixelStrip.SetPixelColor(4, COLOR_BLUE);
-    mPixelStrip.SetPixelColor(5, COLOR_GREEN);
-    mPixelStrip.SetPixelColor(6, COLOR_ORANGE);
-    mPixelStrip.SetPixelColor(7, COLOR_RED);
-    mPixelStrip.SetPixelColor(8, COLOR_BLUE);
-    mPixelStrip.SetPixelColor(9, COLOR_GREEN);
-    mPixelStrip.SetPixelColor(10, COLOR_ORANGE);
-    mPixelStrip.SetPixelColor(11, COLOR_RED);
-    mPixelStrip.SetPixelColor(12, COLOR_PURPLE);
-   // mPixelStrip.SetPixelColor(13, COLOR_GREEN);
-    mPixelStrip.SetPixelColor(14, COLOR_PURPLE);
-    //mPixelStrip.SetPixelColor(15, COLOR_RED);
-//    mPixelStrip.Show();
+    processBlendedAnimationForever(0, PIXEL_COUNT, ONE_SECOND_DURATION, 3, RGBTestColors);
+//  	mPixelStrip.SetPixelColor(19, COLOR_YELLOW);
+//  	mPixelStrip.Show();
 }
 
 /*
@@ -221,7 +206,6 @@ void LEDHandler::setLed(QVector<uint16_t> &index, QVector<RgbColor> &color)
 
 void LEDHandler::turnOffAllLEDs(bool isChargeLightOn)
 {
-    qDebug()<<__LINE__;
 	mPixelStrip.ClearTo(COLOR_BLACK, 0, PIXEL_COUNT);
 	
 	setLEDState(eLED_STATE_INACTIVE);
@@ -362,7 +346,7 @@ void LEDHandler::setLEDState(const uint8_t ledState)
 	switch (ledState)
 	{
 	case eLED_STATE_ZOOM_INACTIVE:
-        mLEDState = eBatteryChargerCharging;
+        mLEDState = eZoomInactive;
 		break;
 	case eLED_STATE_ZOOM_STEP_ONE:
 		mLEDState = eZoomStepOne;
