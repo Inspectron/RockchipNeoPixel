@@ -73,8 +73,6 @@ License along with NeoPixel.  If not, see
 #include "internal/Ws2801GenericMethod.h"
 #include "internal/P9813GenericMethod.h"
 
-#include <QDebug>
-
 
 
 

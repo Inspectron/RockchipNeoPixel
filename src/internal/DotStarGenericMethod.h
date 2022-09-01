@@ -27,7 +27,6 @@ License along with NeoPixel.  If not, see
 #pragma once
 
 #include "TwoWireBitBangImple.h"
-#include <QDebug>
 
 //TODO remove these once Linux SPI tested and works OK
 #define MOSI  9//spi0mosi/gpio10/19 ue
