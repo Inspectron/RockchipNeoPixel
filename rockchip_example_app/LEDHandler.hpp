@@ -9,6 +9,21 @@
 
 namespace LEDHANDLER
 {
+    const uint8_t SATURATION = 255;
+
+    //color definitions
+    //TO DO:moved from LEDHandler.cpp
+    const RgbColor COLOR_RED        (SATURATION,   0,   0);
+    const RgbColor COLOR_BLUE       (  0,   0, SATURATION);
+    const RgbColor COLOR_GREEN      (  0, SATURATION,   0);
+    const RgbColor COLOR_LIGHT_GREEN ( 19, SATURATION,  15);
+    const RgbColor COLOR_WHITE      (SATURATION, SATURATION, SATURATION);
+    const RgbColor COLOR_BLACK      (  0,   0,   0);
+    const RgbColor COLOR_YELLOW     (SATURATION, SATURATION,   0);
+    const RgbColor COLOR_PURPLE     (SATURATION,   0, SATURATION);
+    const RgbColor COLOR_ORANGE     (SATURATION, 50,   0);
+
+
     enum eLEDStates
     {
         eLED_STATE_INACTIVE = 0x00,

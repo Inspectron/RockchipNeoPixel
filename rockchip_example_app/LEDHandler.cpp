@@ -1,7 +1,6 @@
-#include "LEDHandler.hpp"
 #include <time.h>
 #include <QDebug>
-
+#include "LEDHandler.hpp"
 
 using namespace LEDTypes;
 using namespace LEDHANDLER;
@@ -22,18 +21,7 @@ namespace
 	const uint8_t MIC_STATUS_LIGHT_IDX 	= WIFI_STATUS_LIGHT_IDX + 2;
 	const uint8_t BATTERY_STATUS_LIGHT_IDX = WIFI_STATUS_LIGHT_IDX + 3;
 	
-	const uint8_t SATURATION = 255;
-	
-	//color definitions
-	const RgbColor COLOR_RED        (SATURATION,   0,   0);
-	const RgbColor COLOR_BLUE       (  0,   0, SATURATION);
-	const RgbColor COLOR_GREEN      (  0, SATURATION,   0);
-	const RgbColor COLOR_LIGHT_GREEN ( 19, SATURATION,  15);
-	const RgbColor COLOR_WHITE      (SATURATION, SATURATION, SATURATION);
-	const RgbColor COLOR_BLACK      (  0,   0,   0);
-	const RgbColor COLOR_YELLOW     (SATURATION, SATURATION,   0);
-	const RgbColor COLOR_PURPLE     (SATURATION,   0, SATURATION);
-	const RgbColor COLOR_ORANGE     (SATURATION, 50,   0);
+
 
 	//animation indexes
 	const uint8_t FLASHLIGHT_ANIMATION_IDX = 0;
@@ -147,7 +135,6 @@ void LEDHandler::testLights()
 */
 void LEDHandler::setLed(uint16_t &index, RgbColor &color)
 {
-    //
     mPixelStrip.ClearTo(COLOR_BLACK);
 
     mPixelStrip.SetPixelColor(index,color);
@@ -166,10 +153,7 @@ void LEDHandler::setLed(QVector<uint16_t> &index, RgbColor &color)
     for(int i =0;i < index.size();i++)
    {
     colorindex = index.at(i);
-    qWarning()<<"at index:"<<index.at(i);
-    mPixelStrip.ClearTo(COLOR_BLACK);
-    mPixelStrip.SetPixelColor(colorindex,color);
-    mPixelStrip.Show();
+    setLed(colorindex,color);
    }
 
 }
@@ -190,10 +174,7 @@ void LEDHandler::setLed(QVector<uint16_t> &index, QVector<RgbColor> &color)
        {
         colorindex = index.at(i);
         ledcolor = color.at(i);
-        qWarning()<<"at index:"<<index.at(i);
-        mPixelStrip.ClearTo(COLOR_BLACK);
-        mPixelStrip.SetPixelColor(colorindex,ledcolor);
-        mPixelStrip.Show();
+        setLed(colorindex,ledcolor);
        }
     }
     else
