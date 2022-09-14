@@ -1,5 +1,6 @@
 #include <time.h>
 #include <QDebug>
+#include <QTimer>
 #include "LEDHandler.hpp"
 
 using namespace LEDTypes;
@@ -7,6 +8,15 @@ using namespace LEDHANDLER;
 
 namespace
 {
+    QVector<uint16_t> vec = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    QVector<uint16_t> vec1 = {6,7,8,9};
+    QVector<uint16_t> vec2 = {16,17,18,19};
+    QVector<uint16_t> vec3 = {0,1,2,3};
+    QVector<RgbColor> veccolor = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_YELLOW,COLOR_PURPLE,COLOR_ORANGE,
+                                  COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_YELLOW,COLOR_PURPLE,COLOR_ORANGE,
+                                  COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_BLUE,COLOR_ORANGE};
+    QVector<RgbColor> veccolor1 = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN};
+    QVector<RgbColor> veccolor2 = {COLOR_BLUE,COLOR_PURPLE,COLOR_LIGHT_GREEN,COLOR_RED};
 	const uint8_t POWER_LED					=  7;   // PA7
 	
 	const uint16_t PIXEL_RING_COUNT			= 16;
@@ -111,6 +121,10 @@ LEDHandler::LEDHandler()
 	mPixelStrip.Begin();
 	mPixelStrip.ClearTo(COLOR_BLACK);
 	mPixelStrip.Show();
+
+    mPixelAnimator.StartAnimation(1,10,loopAnimUpdate);//blue
+    mPixelAnimator.StartAnimation(2,10,loopAnimUpdate2);//orange
+    mPixelAnimator.StartAnimation(3,10,loopAnimUpdate1);//red
 }
 
 LEDHandler::~LEDHandler()
@@ -124,16 +138,15 @@ void LEDHandler::startSpi()
 
 void LEDHandler::testLights()
 {
-    processBlendedAnimationForever(0, PIXEL_COUNT, ONE_SECOND_DURATION, 3, RGBTestColors);
-//  	mPixelStrip.SetPixelColor(19, COLOR_YELLOW);
-//  	mPixelStrip.Show();
+    mPixelAnimator.UpdateAnimations();
+    mPixelStrip.Show();
 }
 
 /*
  * index- list of all pixels you want to modify
  * color- ledcolor to set for provided set of indexes.
 */
-void LEDHandler::setLed(uint16_t &index, RgbColor &color)
+void LEDHandler::setLed(uint16_t &index,const RgbColor &color)
 {
     mPixelStrip.ClearTo(COLOR_BLACK);
 
@@ -145,7 +158,7 @@ void LEDHandler::setLed(uint16_t &index, RgbColor &color)
  * index- list of all pixels you want to modify
  * color- ledcolor to set for provided set of indexes.
 */
-void LEDHandler::setLed(QVector<uint16_t> &index, RgbColor &color)
+void LEDHandler::setLed(QVector<uint16_t> &index, const RgbColor &color)
 {
     uint16_t colorindex =0;
     //qWarning()<<"at index:"<<index;
@@ -153,8 +166,9 @@ void LEDHandler::setLed(QVector<uint16_t> &index, RgbColor &color)
     for(int i =0;i < index.size();i++)
    {
     colorindex = index.at(i);
-    setLed(colorindex,color);
+    mPixelStrip.SetPixelColor(colorindex,color);
    }
+    mPixelStrip.Show();
 
 }
 
@@ -1042,18 +1056,48 @@ void LEDHandler::loopAnimUpdate(const AnimationParam& param)
 	if (param.state == AnimationState_Completed)
 	{
 		// done, time to restart this position tracking animation/timer
-		msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
+        msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
+        msLEDHandler->setLed(vec1,COLOR_BLUE);
 
-		if(msLEDHandler->mBarcodeScanState == eScanNoOp)
-		{
-			// rotate the complete mPixelStrip one pixel to the right on every update
-			msLEDHandler->mPixelStrip.RotateRight(1, 0, (PIXEL_RING_COUNT-1));
-		}
-		else
-		{
-			msLEDHandler->mPixelStrip.RotateRight(1, 0, (PIXEL_RING_COUNT - LED_SECTION_SIZE));
-		}
 	}
 }
+
+void LEDHandler::loopAnimUpdate1(const AnimationParam& param)
+{
+    // wait for this animation to complete,
+    // we are using it as a timer of sorts
+    if (param.state == AnimationState_Completed)
+    {
+        // done, time to restart this position tracking animation/timer
+        msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
+        msLEDHandler->setLed(vec2,COLOR_PURPLE);
+    }
+}
+
+void LEDHandler::loopAnimUpdate2(const AnimationParam& param)
+{
+    // wait for this animation to complete,
+    // we are using it as a timer of sorts
+    if (param.state == AnimationState_Completed)
+    {
+        // done, time to restart this position tracking animation/timer
+        msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
+        msLEDHandler->setLed(vec3,COLOR_ORANGE);
+    }
+}
+
+void LEDHandler::setLedForTime(const u_int16_t &time)
+{
+    msLEDHandler->setLed(vec1,COLOR_PURPLE);
+
+    QTimer::singleShot(time, [&]()
+    {
+       qDebug() << "set the LED inside the timer";
+       msLEDHandler->setLed(vec2,COLOR_PURPLE);
+    });
+
+
+}
+
 
 

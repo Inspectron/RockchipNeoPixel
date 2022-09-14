@@ -38,12 +38,8 @@ int main()
 #else
     pLEDHandler = new LEDHandler();
 
-    QVector<uint16_t> vec = {0,1,2,3};
-    QVector<RgbColor> veccolor = {COLOR_BLUE,COLOR_GREEN,COLOR_PURPLE,COLOR_LIGHT_GREEN};
-    //test 3
     while(1){
-        usleep(1000);
-        pLEDHandler->setLed(vec,veccolor);
+        pLEDHandler->testLights();
     }
 #endif
     return 0;

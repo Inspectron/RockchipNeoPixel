@@ -104,9 +104,10 @@ public:
 	void turnOffAllLEDs(bool isChargeLightOn=false);
 
     //Set leds to required color
-    void setLed(uint16_t &index, RgbColor &color);
-    void setLed(QVector<uint16_t> &index, RgbColor &color);
+    void setLed(uint16_t &index, const RgbColor &color);
+    void setLed(QVector<uint16_t> &index,  const RgbColor &color);
     void setLed(QVector<uint16_t> &index, QVector<RgbColor> &color);
+    void setLedForTime(const u_int16_t &time);
 	
 	//status indicators
 	void setLEDBatteryStatusState(uint8_t state);
@@ -128,6 +129,8 @@ private:
 	
 	static void fadeAnimUpdate(const AnimationParam& param);
 	static void loopAnimUpdate(const AnimationParam& param);
+    static void loopAnimUpdate1(const AnimationParam& param);
+    static void loopAnimUpdate2(const AnimationParam& param);
 
 	void fadeInFadeOutRinseRepeat(uint8_t animIdx);
 	void blendInBlendOutRinseRepeat();
