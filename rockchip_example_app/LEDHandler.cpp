@@ -10,7 +10,7 @@ namespace
 {
     QVector<uint16_t> vec = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     QVector<uint16_t> vec1 = {6,7,8,9};
-    QVector<uint16_t> vec2 = {16,17,18,19};
+    QVector<uint16_t> vec2 = {15,16,17,18};
     QVector<uint16_t> vec3 = {0,1,2,3};
     QVector<RgbColor> veccolor = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_YELLOW,COLOR_PURPLE,COLOR_ORANGE,
                                   COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_YELLOW,COLOR_PURPLE,COLOR_ORANGE,
@@ -20,7 +20,7 @@ namespace
 	const uint8_t POWER_LED					=  7;   // PA7
 	
 	const uint16_t PIXEL_RING_COUNT			= 16;
-	const uint16_t PIXEL_COUNT				= 20; // number of pixels on the LED ring
+	const uint16_t PIXEL_COUNT				= 19; // number of pixels on the LED ring
 
 	const uint8_t LED_COB_LED_START_INDEX = 0;
 	const uint8_t BARCODE_LED_START_INDEX = 4;
