@@ -93,7 +93,6 @@ public:
 	void testLights();
 	void determineLightState();
 
-	void startSpi();
 	//main button LED states
 	void setLEDState(const uint8_t ledState);
 
@@ -119,6 +118,10 @@ public:
 	{
 		mIsPowerLightBlinking = isBooting;
 	}
+
+public slots:
+    void start();
+    void stop();
 
 private:
 	void determineWifiStatusState();

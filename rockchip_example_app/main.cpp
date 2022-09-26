@@ -1,11 +1,10 @@
 #include <unistd.h>
 #include <QVector>
+#include <QThread>
 #include "inspcore.hpp"
 #include "LEDHandler.hpp"
 
 using namespace LEDHANDLER;
-
-LEDHandler* pLEDHandler;
 
 #define DBG 0
 
@@ -36,7 +35,14 @@ int main()
     pLEDHandler->setLEDBatteryStatusState(eLED_BATTERY_CHARGING);
 
 #else
-    pLEDHandler = new LEDHandler();
+    LEDHandler *pLEDHandler = new LEDHandler();
+    QThread *pThread = new QThread;
+    pLEDHandler->moveToThread(pThread);
+    QObject::connect( pThread, SIGNAL(started()), pLEDHandler, SLOT(start()) );
+    QObject::connect( pThread, SIGNAL(finished()), pLEDHandler, SLOT(stop()) );
+
+    // start the thread
+    pThread->start();
 
     while(1){
         pLEDHandler->testLights();

@@ -8,6 +8,10 @@ using namespace LEDHANDLER;
 
 namespace
 {
+    const uint16_t PIXEL_RING_COUNT			= 16;
+    const uint16_t PIXEL_COUNT				= 19; // number of pixels on the LED ring
+
+    //test vectors
     QVector<uint16_t> vec = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     QVector<uint16_t> vec1 = {6,7,8,9};
     QVector<uint16_t> vec2 = {15,16,17,18};
@@ -15,13 +19,10 @@ namespace
     QVector<RgbColor> veccolor = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_YELLOW,COLOR_PURPLE,COLOR_ORANGE,
                                   COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_YELLOW,COLOR_PURPLE,COLOR_ORANGE,
                                   COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_BLUE,COLOR_ORANGE};
-    QVector<RgbColor> veccolor1 = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN};
+    QVector<RgbColor> veccolor1 = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_PURPLE};
     QVector<RgbColor> veccolor2 = {COLOR_BLUE,COLOR_PURPLE,COLOR_LIGHT_GREEN,COLOR_RED};
-	const uint8_t POWER_LED					=  7;   // PA7
-	
-	const uint16_t PIXEL_RING_COUNT			= 16;
-	const uint16_t PIXEL_COUNT				= 19; // number of pixels on the LED ring
 
+	const uint8_t POWER_LED					=  7;   // PA7
 	const uint8_t LED_COB_LED_START_INDEX = 0;
 	const uint8_t BARCODE_LED_START_INDEX = 4;
 	//  const uint8_t CAMERA_LED_START_INDEX = 9;
@@ -117,29 +118,41 @@ LEDHandler::LEDHandler()
 	mAnimationStates[WIFI_ANIMATION_IDX].nColors = 1;
 	mAnimationStates[WIFI_ANIMATION_IDX].currentColorIdx = 0;
 
-	//reset all the neopixels to an off state
+    //Initialize the Pixel strip and use SPI[mPixelStrip(PIXEL_COUNT) indicates we are using SPI method]
 	mPixelStrip.Begin();
+
+    //reset all the neopixels to an off state
 	mPixelStrip.ClearTo(COLOR_BLACK);
 	mPixelStrip.Show();
 
-    mPixelAnimator.StartAnimation(1,10,loopAnimUpdate);//blue
-    mPixelAnimator.StartAnimation(2,10,loopAnimUpdate2);//orange
-    mPixelAnimator.StartAnimation(3,10,loopAnimUpdate1);//red
 }
 
 LEDHandler::~LEDHandler()
 {
 }
 
-void LEDHandler::startSpi()
-{
-	mPixelStrip.Begin();
-}
-
 void LEDHandler::testLights()
 {
-    mPixelAnimator.UpdateAnimations();
+    mPixelStrip.ClearTo(COLOR_BLACK);
+    //mPixelAnimator.UpdateAnimations(); //Can include this once we start animations according to req
     mPixelStrip.Show();
+}
+
+//Thread Function
+void LEDHandler::start()
+{
+    mIsVideoCaptureInProgress = true;
+
+    while(mIsVideoCaptureInProgress)
+    {
+      setLed(vec1,veccolor1);
+    }
+
+}
+
+void LEDHandler::stop()
+{
+    mIsVideoCaptureInProgress = false;
 }
 
 /*
@@ -148,10 +161,7 @@ void LEDHandler::testLights()
 */
 void LEDHandler::setLed(uint16_t &index,const RgbColor &color)
 {
-    mPixelStrip.ClearTo(COLOR_BLACK);
-
     mPixelStrip.SetPixelColor(index,color);
-    mPixelStrip.Show();
 }
 
 /*
@@ -161,14 +171,11 @@ void LEDHandler::setLed(uint16_t &index,const RgbColor &color)
 void LEDHandler::setLed(QVector<uint16_t> &index, const RgbColor &color)
 {
     uint16_t colorindex =0;
-    //qWarning()<<"at index:"<<index;
-    mPixelStrip.ClearTo(COLOR_BLACK);
     for(int i =0;i < index.size();i++)
    {
     colorindex = index.at(i);
     mPixelStrip.SetPixelColor(colorindex,color);
    }
-    mPixelStrip.Show();
 
 }
 
@@ -193,7 +200,7 @@ void LEDHandler::setLed(QVector<uint16_t> &index, QVector<RgbColor> &color)
     }
     else
     {
-        qWarning()<<"make sure the number of led to be set are equal to color";
+        qWarning()<<"pixel and color vector should be of same size";
     }
 
 
