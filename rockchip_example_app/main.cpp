@@ -45,7 +45,7 @@ int main()
     pThread->start();
 
     while(1){
-        pLEDHandler->testLights();
+        pLEDHandler->setUpLights();
     }
 #endif
     return 0;

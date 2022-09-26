@@ -90,7 +90,7 @@ public:
 	LEDHandler();
 	virtual ~LEDHandler();
 
-	void testLights();
+    void setUpLights();
 	void determineLightState();
 
 	//main button LED states

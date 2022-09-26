@@ -130,11 +130,15 @@ LEDHandler::LEDHandler()
 LEDHandler::~LEDHandler()
 {
 }
-
-void LEDHandler::testLights()
+/*
+ * Loop function which needs to run through the time of exection
+*/
+void LEDHandler::setUpLights()
 {
     mPixelStrip.ClearTo(COLOR_BLACK);
     //mPixelAnimator.UpdateAnimations(); //Can include this once we start animations according to req
+
+    //Library function  which sends the data to actual physical pixels
     mPixelStrip.Show();
 }
 
