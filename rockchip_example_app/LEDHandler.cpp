@@ -1097,18 +1097,6 @@ void LEDHandler::loopAnimUpdate2(const AnimationParam& param)
     }
 }
 
-void LEDHandler::setLedForTime(const u_int16_t &time)
-{
-    msLEDHandler->setLed(vec1,COLOR_PURPLE);
-
-    QTimer::singleShot(time, [&]()
-    {
-       qDebug() << "set the LED inside the timer";
-       msLEDHandler->setLed(vec2,COLOR_PURPLE);
-    });
-
-
-}
 
 
 
