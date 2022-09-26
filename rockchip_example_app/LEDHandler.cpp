@@ -1,16 +1,28 @@
-#include "LEDHandler.hpp"
 #include <time.h>
+#include <QDebug>
+#include <QTimer>
+#include "LEDHandler.hpp"
 
 using namespace LEDTypes;
 using namespace LEDHANDLER;
 
 namespace
 {
-	const uint8_t POWER_LED					=  7;   // PA7
-	
-	const uint16_t PIXEL_RING_COUNT			= 16;
-	const uint16_t PIXEL_COUNT				= 20; // number of pixels on the LED ring
+    const uint16_t PIXEL_RING_COUNT			= 16;
+    const uint16_t PIXEL_COUNT				= 19; // number of pixels on the LED ring
 
+    //test vectors
+    QVector<uint16_t> vec = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    QVector<uint16_t> vec1 = {6,7,8,9};
+    QVector<uint16_t> vec2 = {15,16,17,18};
+    QVector<uint16_t> vec3 = {0,1,2,3};
+    QVector<RgbColor> veccolor = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_YELLOW,COLOR_PURPLE,COLOR_ORANGE,
+                                  COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_YELLOW,COLOR_PURPLE,COLOR_ORANGE,
+                                  COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_BLUE,COLOR_ORANGE};
+    QVector<RgbColor> veccolor1 = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_PURPLE};
+    QVector<RgbColor> veccolor2 = {COLOR_BLUE,COLOR_PURPLE,COLOR_LIGHT_GREEN,COLOR_RED};
+
+	const uint8_t POWER_LED					=  7;   // PA7
 	const uint8_t LED_COB_LED_START_INDEX = 0;
 	const uint8_t BARCODE_LED_START_INDEX = 4;
 	//  const uint8_t CAMERA_LED_START_INDEX = 9;
@@ -20,18 +32,7 @@ namespace
 	const uint8_t MIC_STATUS_LIGHT_IDX 	= WIFI_STATUS_LIGHT_IDX + 2;
 	const uint8_t BATTERY_STATUS_LIGHT_IDX = WIFI_STATUS_LIGHT_IDX + 3;
 	
-	const uint8_t SATURATION = 255;
-	
-	//color definitions
-	const RgbColor COLOR_RED        (SATURATION,   0,   0);
-	const RgbColor COLOR_BLUE       (  0,   0, SATURATION);
-	const RgbColor COLOR_GREEN      (  0, SATURATION,   0);
-	const RgbColor COLOR_LIGHT_GREEN ( 19, SATURATION,  15);
-	const RgbColor COLOR_WHITE      (SATURATION, SATURATION, SATURATION);
-	const RgbColor COLOR_BLACK      (  0,   0,   0);
-	const RgbColor COLOR_YELLOW     (SATURATION, SATURATION,   0);
-	const RgbColor COLOR_PURPLE     (SATURATION,   0, SATURATION);
-	const RgbColor COLOR_ORANGE     (SATURATION, 50,   0);
+
 
 	//animation indexes
 	const uint8_t FLASHLIGHT_ANIMATION_IDX = 0;
@@ -117,26 +118,96 @@ LEDHandler::LEDHandler()
 	mAnimationStates[WIFI_ANIMATION_IDX].nColors = 1;
 	mAnimationStates[WIFI_ANIMATION_IDX].currentColorIdx = 0;
 
-	//reset all the neopixels to an off state
+    //Initialize the Pixel strip and use SPI[mPixelStrip(PIXEL_COUNT) indicates we are using SPI method]
 	mPixelStrip.Begin();
+
+    //reset all the neopixels to an off state
 	mPixelStrip.ClearTo(COLOR_BLACK);
 	mPixelStrip.Show();
+
 }
 
 LEDHandler::~LEDHandler()
 {
 }
-
-void LEDHandler::startSpi()
+/*
+ * Loop function which needs to run through the time of exection
+*/
+void LEDHandler::setUpLights()
 {
-	mPixelStrip.Begin();
+    mPixelStrip.ClearTo(COLOR_BLACK);
+    //mPixelAnimator.UpdateAnimations(); //Can include this once we start animations according to req
+
+    //Library function  which sends the data to actual physical pixels
+    mPixelStrip.Show();
 }
 
-void LEDHandler::testLights()
+//Thread Function
+void LEDHandler::start()
 {
-	processBlendedAnimationForever(0, PIXEL_COUNT, ONE_SECOND_DURATION, 3, RGBTestColors);
-//  	mPixelStrip.SetPixelColor(19, COLOR_YELLOW);
-//  	mPixelStrip.Show();
+    mIsVideoCaptureInProgress = true;
+
+    while(mIsVideoCaptureInProgress)
+    {
+      setLed(vec1,veccolor1);
+    }
+
+}
+
+void LEDHandler::stop()
+{
+    mIsVideoCaptureInProgress = false;
+}
+
+/*
+ * index- list of all pixels you want to modify
+ * color- ledcolor to set for provided set of indexes.
+*/
+void LEDHandler::setLed(uint16_t &index,const RgbColor &color)
+{
+    mPixelStrip.SetPixelColor(index,color);
+}
+
+/*
+ * index- list of all pixels you want to modify
+ * color- ledcolor to set for provided set of indexes.
+*/
+void LEDHandler::setLed(QVector<uint16_t> &index, const RgbColor &color)
+{
+    uint16_t colorindex =0;
+    for(int i =0;i < index.size();i++)
+   {
+    colorindex = index.at(i);
+    mPixelStrip.SetPixelColor(colorindex,color);
+   }
+
+}
+
+/*
+ * index- list of all pixels you want to modify
+ * color- list of all ledcolor you want to set for a respective led.
+ * size of input params should be same
+ * Note-for now this function sets index[i] to color[i]
+*/
+void LEDHandler::setLed(QVector<uint16_t> &index, QVector<RgbColor> &color)
+{
+    uint16_t colorindex = 0;
+    RgbColor ledcolor = COLOR_BLACK;
+    if(index.size()==color.size())
+    {
+        for(int i =0;i < index.size();i++)
+       {
+        colorindex = index.at(i);
+        ledcolor = color.at(i);
+        setLed(colorindex,ledcolor);
+       }
+    }
+    else
+    {
+        qWarning()<<"pixel and color vector should be of same size";
+    }
+
+
 }
 
 void LEDHandler::turnOffAllLEDs(bool isChargeLightOn)
@@ -281,7 +352,7 @@ void LEDHandler::setLEDState(const uint8_t ledState)
 	switch (ledState)
 	{
 	case eLED_STATE_ZOOM_INACTIVE:
-		mLEDState = eZoomInactive;
+        mLEDState = eZoomInactive;
 		break;
 	case eLED_STATE_ZOOM_STEP_ONE:
 		mLEDState = eZoomStepOne;
@@ -440,7 +511,7 @@ void LEDHandler::setLEDBatteryStatusState(uint8_t state)
 	switch(state)
 	{
 	case eLED_BATTERY_CHARGING:
-		mBatteryChargeState = eBatteryChargerCharging;
+        mBatteryChargeState = eZoomInactive;
 		break;
 	case eLED_BATTERY_HALF_FULL:
 		mBatteryChargeState = eBatteryHalf;
@@ -996,16 +1067,36 @@ void LEDHandler::loopAnimUpdate(const AnimationParam& param)
 	if (param.state == AnimationState_Completed)
 	{
 		// done, time to restart this position tracking animation/timer
-		msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
+        msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
+        msLEDHandler->setLed(vec1,COLOR_BLUE);
 
-		if(msLEDHandler->mBarcodeScanState == eScanNoOp)
-		{
-			// rotate the complete mPixelStrip one pixel to the right on every update
-			msLEDHandler->mPixelStrip.RotateRight(1, 0, (PIXEL_RING_COUNT-1));
-		}
-		else
-		{
-			msLEDHandler->mPixelStrip.RotateRight(1, 0, (PIXEL_RING_COUNT - LED_SECTION_SIZE));
-		}
 	}
 }
+
+void LEDHandler::loopAnimUpdate1(const AnimationParam& param)
+{
+    // wait for this animation to complete,
+    // we are using it as a timer of sorts
+    if (param.state == AnimationState_Completed)
+    {
+        // done, time to restart this position tracking animation/timer
+        msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
+        msLEDHandler->setLed(vec2,COLOR_PURPLE);
+    }
+}
+
+void LEDHandler::loopAnimUpdate2(const AnimationParam& param)
+{
+    // wait for this animation to complete,
+    // we are using it as a timer of sorts
+    if (param.state == AnimationState_Completed)
+    {
+        // done, time to restart this position tracking animation/timer
+        msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
+        msLEDHandler->setLed(vec3,COLOR_ORANGE);
+    }
+}
+
+
+
+

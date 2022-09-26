@@ -31,7 +31,7 @@ License along with NeoPixel.  If not, see
 // anonymous namespace
 namespace
 {
-    const char* SPI_DEV_FILENAME = "/sys/class/spidev";  //TODO need to think how this can be done as arg
+    const char* SPI_DEV_FILENAME = "/dev/spidev2.0";  //TODO need to think how this can be done as arg
 }
 
 class SpiSpeed40Mhz

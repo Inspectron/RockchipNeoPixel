@@ -100,7 +100,7 @@ public:
         _countPixels(countPixels),
         _state(0),
         _method(countPixels, T_COLOR_FEATURE::PixelSize, T_COLOR_FEATURE::SettingsSize)
-    {
+    {       
     }
 
     ~NeoPixelBus()

@@ -29,8 +29,8 @@ License along with NeoPixel.  If not, see
 #include "TwoWireBitBangImple.h"
 
 //TODO remove these once Linux SPI tested and works OK
-#define MOSI  9
-#define SCK   11
+#define MOSI  9//spi0mosi/gpio10/19 ue
+#define SCK   11//spi0sclk/gpio11/23 ue
 
 
 template<typename T_TWOWIRE> class DotStarMethodBase
@@ -45,10 +45,10 @@ public:
         memset(_data, 0, _sizeData);
     }
 
-	DotStarMethodBase(uint16_t pixelCount, size_t elementSize, size_t settingsSize) :
-		DotStarMethodBase(SCK, MOSI, pixelCount, elementSize, settingsSize)
-	{
-	}
+    DotStarMethodBase(uint16_t pixelCount, size_t elementSize, size_t settingsSize) :
+        DotStarMethodBase(SCK, MOSI, pixelCount, elementSize, settingsSize)
+    {
+    }
 
     ~DotStarMethodBase()
     {
@@ -74,20 +74,21 @@ public:
 
         // start frame
 		_wire.transmitBytes(startFrame, sizeof(startFrame));
-        
+
         // data
 		_wire.transmitBytes(_data, _sizeData);
 
        // reset frame
 		_wire.transmitBytes(resetFrame, sizeof(resetFrame));
-        
+
         // end frame 
-        
+
 		// one bit for every two pixels with no less than 1 byte
-// 		for (size_t endFrameByte = 0; endFrameByte < _sizeEndFrame; endFrameByte++)
-// 		{
-// 			_wire.transmitByte(0x00);
-// 		}
+
+//        for (size_t endFrameByte = 0; endFrameByte < _sizeEndFrame; endFrameByte++)
+//        {
+//            _wire.transmitByte(0x00);
+//        }
 		
 		_wire.endTransaction();
     }
