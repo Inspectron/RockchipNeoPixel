@@ -44,9 +44,11 @@ int main()
     // start the thread
     pThread->start();
 
-    while(1){
-        pLEDHandler->setUpLights();
-    }
+    //while(1){
+    //    pLEDHandler->setUpLights();
+    //}
 #endif
+
+    while(1) { QThread::msleep(10); } // Dont do this
     return 0;
 }

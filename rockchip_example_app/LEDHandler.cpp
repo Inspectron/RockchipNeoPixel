@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QTimer>
 #include "LEDHandler.hpp"
+#include <QThread>
+#include <QtConcurrent/QtConcurrent>
 
 using namespace LEDTypes;
 using namespace LEDHANDLER;
@@ -100,7 +102,10 @@ LEDHandler::LEDHandler()
 , mAnimationStates(new InspectronAnimationState[NUM_ANIM_CHANNELS])
 , mPixelStrip(PIXEL_COUNT)
 , mPixelAnimator(NUM_ANIM_CHANNELS)
+, mColor(COLOR_GREEN)
 {
+
+    qCritical() << QThread::currentThreadId();
 	if(msLEDHandler == NULL)
 	{
 		msLEDHandler = this;
@@ -119,17 +124,31 @@ LEDHandler::LEDHandler()
 	mAnimationStates[WIFI_ANIMATION_IDX].currentColorIdx = 0;
 
     //Initialize the Pixel strip and use SPI[mPixelStrip(PIXEL_COUNT) indicates we are using SPI method]
-	mPixelStrip.Begin();
+    mPixelStrip.Begin();
 
     //reset all the neopixels to an off state
-	mPixelStrip.ClearTo(COLOR_BLACK);
-	mPixelStrip.Show();
+    mPixelStrip.ClearTo(COLOR_BLACK);
+    mPixelStrip.Show();
+    //mPixelAnimator.StartAnimation(1,10,loopAnimUpdate);//blue
+
+
+    QtConcurrent::run([&]
+    {
+       while (1)
+       {
+           QThread::sleep(2);
+           mColor = (mColor == COLOR_GREEN ? COLOR_RED : COLOR_GREEN);
+           qDebug() << "set color to " << mColor.R << mColor.G << mColor.B;
+       }
+    });
+
 
 }
 
 LEDHandler::~LEDHandler()
 {
 }
+
 /*
  * Loop function which needs to run through the time of exection
 */
@@ -145,13 +164,21 @@ void LEDHandler::setUpLights()
 //Thread Function
 void LEDHandler::start()
 {
+    qDebug()<<"bye" ;
+    qCritical() << QThread::currentThreadId();
     mIsVideoCaptureInProgress = true;
 
+    qWarning() << __LINE__;
     while(mIsVideoCaptureInProgress)
     {
-      setLed(vec1,veccolor1);
+        msLEDHandler->mPixelStrip.ClearTo(COLOR_BLACK);
+        msLEDHandler->setLed(vec1, msLEDHandler->mColor);
+        QThread::msleep(1);
+
+        msLEDHandler->mPixelStrip.Show();
     }
 
+    qWarning() << __LINE__;
 }
 
 void LEDHandler::stop()
@@ -212,7 +239,7 @@ void LEDHandler::setLed(QVector<uint16_t> &index, QVector<RgbColor> &color)
 
 void LEDHandler::turnOffAllLEDs(bool isChargeLightOn)
 {
-	mPixelStrip.ClearTo(COLOR_BLACK, 0, PIXEL_COUNT);
+    mPixelStrip.ClearTo(COLOR_BLACK, 0, PIXEL_COUNT);
 	
 	setLEDState(eLED_STATE_INACTIVE);
 	setLEDScanState(eSCAN_INACTIVE);
@@ -320,7 +347,7 @@ void LEDHandler::determineLightState()
 		break;
 	case eUploadingToCloud:
 		mPixelAnimator.UpdateAnimations();
-		mPixelStrip.Show();
+        mPixelStrip.Show();
 		break;
 	case eUploadToCloudEnd:
 		mPixelAnimator.StopAll();
@@ -343,7 +370,7 @@ void LEDHandler::determineLightState()
 	if(mPixelAnimator.IsAnimating())
 	{
 		mPixelAnimator.UpdateAnimations();
-		mPixelStrip.Show();
+        mPixelStrip.Show();
 	}
 }
 
@@ -469,9 +496,9 @@ void LEDHandler::determineScanStateLights()
 				
 				for(int i = 0; i < numLeds; i++)
 				{
-					mPixelStrip.SetPixelColor(startLED++, SCANNED_COLOR);
+                    mPixelStrip.SetPixelColor(startLED++, SCANNED_COLOR);
 				}
-				mPixelStrip.Show();
+                mPixelStrip.Show();
 			}
 			else
 			{
@@ -486,9 +513,9 @@ void LEDHandler::determineScanStateLights()
 				
 			for(int i = 0; i < LED_SECTION_SIZE; i++)
 			{
-				mPixelStrip.SetPixelColor(startLED++, SCANNING_COLOR);
+                mPixelStrip.SetPixelColor(startLED++, SCANNING_COLOR);
 			}
-			mPixelStrip.Show();
+            mPixelStrip.Show();
 		}
 		break;
 	case eScanError:
@@ -540,17 +567,17 @@ void LEDHandler::determineBatteryLightState()
 	switch(mBatteryChargeState)
 	{
 	case eBatteryChargerIdle:
- 			mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, BATTERY_IDLE_COLOR);
+            mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, BATTERY_IDLE_COLOR);
 		break;
 	case eBatteryHalf:
-			mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, BATTERY_HALF_COLOR);
+            mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, BATTERY_HALF_COLOR);
 		break;
 	case eBatteryQuarter:
- 			mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, BATTERY_QUARTER_COLOR);
+            mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, BATTERY_QUARTER_COLOR);
 		break;
 	case eBatteryChargerError:
 		//no defined error conditions
-		mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, COLOR_BLACK);
+        mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, COLOR_BLACK);
 		break;
 	default:
 		isAnimationNeeded = true;
@@ -572,17 +599,17 @@ void LEDHandler::determineBatteryLightState()
 				//use the current color idx as a way to figure out if the led should be turning
 				//on or off
 				mAnimationStates[BATTERY_ANIMATION_IDX].currentColorIdx = 1;
-				mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, BATTERY_CHARGING_COLOR);
+                mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, BATTERY_CHARGING_COLOR);
 			}
 			else
 			{
 				mAnimationStates[BATTERY_ANIMATION_IDX].currentColorIdx = 0;
-				mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, COLOR_BLACK);
+                mPixelStrip.SetPixelColor(BATTERY_STATUS_LIGHT_IDX, COLOR_BLACK);
 			}
 			//reset the timer
 			mAnimationStates[BATTERY_ANIMATION_IDX].start_time = 0;
 			mAnimationStates[BATTERY_ANIMATION_IDX].current_duration = 0;
-			mPixelStrip.Show();
+            mPixelStrip.Show();
 		}
 	}
 }
@@ -592,7 +619,7 @@ void LEDHandler::determineWifiStatusState()
 	if (mPixelAnimator.IsAnimationActive(WIFI_ANIMATION_IDX))
 	{
 		mPixelAnimator.UpdateAnimations();
-		mPixelStrip.Show();
+        mPixelStrip.Show();
 	}
 	else
 	{
@@ -600,7 +627,7 @@ void LEDHandler::determineWifiStatusState()
 		{
 		case eLED_WIFI_BOOTING:
 			//turn the LED off
-			mPixelStrip.SetPixelColor(WIFI_STATUS_LIGHT_IDX, COLOR_BLACK);
+            mPixelStrip.SetPixelColor(WIFI_STATUS_LIGHT_IDX, COLOR_BLACK);
 			//this no longer acts like the wiscope
 			//processAnimationForever(WIFI_STATUS_LIGHT_IDX, 1, WIFI_COLOR_BOOTING, ONE_HUNDRED_MILLISECOND_DURATION, WIFI_ANIMATION_IDX);
 			break;
@@ -609,17 +636,17 @@ void LEDHandler::determineWifiStatusState()
 			fadeInFadeOutRinseRepeat(WIFI_ANIMATION_IDX);
 			break;
 		case eLED_WIFI_HOTSPOT_CONNECTED:
-			mPixelStrip.SetPixelColor(WIFI_STATUS_LIGHT_IDX, WIFI_HOTSPOT_COLOR);
+            mPixelStrip.SetPixelColor(WIFI_STATUS_LIGHT_IDX, WIFI_HOTSPOT_COLOR);
 			break;
 		case eLED_WIFI_INFRASTRUCTURE_NO_CONNECTION:
 			mAnimationStates[WIFI_ANIMATION_IDX].colors = &WIFI_INFRA_COLOR;
 			fadeInFadeOutRinseRepeat(WIFI_ANIMATION_IDX);
 			break;
 		case eLED_WIFI_INFRASTRUCTURE_CONNECTED:
-			mPixelStrip.SetPixelColor(WIFI_STATUS_LIGHT_IDX, WIFI_INFRA_COLOR);
+            mPixelStrip.SetPixelColor(WIFI_STATUS_LIGHT_IDX, WIFI_INFRA_COLOR);
 			break;
 		case eLED_WIFI_ERROR:
-			mPixelStrip.SetPixelColor(WIFI_STATUS_LIGHT_IDX, COLOR_BLACK);
+            mPixelStrip.SetPixelColor(WIFI_STATUS_LIGHT_IDX, COLOR_BLACK);
 			break;
 		default:
 			break;
@@ -632,7 +659,7 @@ void LEDHandler::determineMicStatusState()
 	switch(mMicStatus)
 	{
 	case eLED_MIC_ON:
-		mPixelStrip.SetPixelColor(MIC_STATUS_LIGHT_IDX, MIC_COLOR);
+        mPixelStrip.SetPixelColor(MIC_STATUS_LIGHT_IDX, MIC_COLOR);
 		
 		if(setupAnimationTimer(MIC_ANIMATION_IDX, ONE_HALF_SECOND_DURATION))
 		{
@@ -641,7 +668,7 @@ void LEDHandler::determineMicStatusState()
 				
 			for(int i = 0; i < numLeds; i++)
 			{
-				mPixelStrip.SetPixelColor(startLED++, ZOOM_COLOR);
+                mPixelStrip.SetPixelColor(startLED++, ZOOM_COLOR);
 			}
 		}
 		else
@@ -651,17 +678,17 @@ void LEDHandler::determineMicStatusState()
 		}
 		break;
 	case eLED_MIC_OFF:
-		mPixelStrip.SetPixelColor(MIC_STATUS_LIGHT_IDX, COLOR_BLACK);
+        mPixelStrip.SetPixelColor(MIC_STATUS_LIGHT_IDX, COLOR_BLACK);
 		break;
 	case eLED_MIC_IDLE:
 		//just keep the status pixel enabled
-		mPixelStrip.SetPixelColor(MIC_STATUS_LIGHT_IDX, MIC_COLOR);
+        mPixelStrip.SetPixelColor(MIC_STATUS_LIGHT_IDX, MIC_COLOR);
 		break;
 	default:
 		//take no action
 		break;
 	}
-	mPixelStrip.Show();
+    mPixelStrip.Show();
 }
 
 bool LEDHandler::setupAnimationTimer(const uint8_t index, const uint32_t duration)
@@ -717,9 +744,9 @@ void LEDHandler::setFlashlightLED(eLEDPercentStep step)
 
 		for(int i = 0; i < numLeds; i++)
 		{
-			mPixelStrip.SetPixelColor(startLED++, FLASHLIGHT_COLOR);
+            mPixelStrip.SetPixelColor(startLED++, FLASHLIGHT_COLOR);
 		}
-		mPixelStrip.Show();
+        mPixelStrip.Show();
 	}
 	else
 	{
@@ -753,9 +780,9 @@ void LEDHandler::setZoomLED(const uint8_t zoomState)
 		
 		for(int i = 0; i < numLeds; i++)
 		{
-			mPixelStrip.SetPixelColor(startLED++, ZOOM_COLOR);
+            mPixelStrip.SetPixelColor(startLED++, ZOOM_COLOR);
 		}
-		mPixelStrip.Show();
+        mPixelStrip.Show();
 	}
 	else
 	{
@@ -773,9 +800,9 @@ void LEDHandler::setLaserLED()
 		
 		for(int i = 0; i < numLeds; i++)
 		{
-			mPixelStrip.SetPixelColor(startLED++, LASER_COLOR);
+            mPixelStrip.SetPixelColor(startLED++, LASER_COLOR);
 		}
-		mPixelStrip.Show();		
+        mPixelStrip.Show();
 	}
 	else
 	{
@@ -825,7 +852,7 @@ void LEDHandler::resetRing()
 {
 	mPixelAnimator.StopAll();
 	clearLEDRing();
-	mPixelStrip.Show();
+    mPixelStrip.Show();
 }
 
 //clear the LED ring with respect to the barcode being active or not
@@ -836,12 +863,12 @@ void LEDHandler::clearLEDRing()
 		//clearto with length arguments seems to be screwed up and produces
 		//weird results with the first light lighting up incorrectly
 //		mPixelStrip.ClearTo(COLOR_BLACK, 0, PIXEL_RING_COUNT);
-		mPixelStrip.ClearTo(COLOR_BLACK);
+        mPixelStrip.ClearTo(COLOR_BLACK);
 	}
 	else
 	{
 //		mPixelStrip.ClearTo(COLOR_BLACK, 0, (PIXEL_RING_COUNT - (LED_SECTION_SIZE +1)));
-		mPixelStrip.ClearTo(COLOR_BLACK);
+        mPixelStrip.ClearTo(COLOR_BLACK);
 	}
 }
 
@@ -918,7 +945,7 @@ void LEDHandler::fadeAnimUpdate(const AnimationParam& param)
 	// apply the color to the mPixelStrip
 	for (uint8_t pixel = msLEDHandler->mAnimationStates[param.index].startLEDindex; pixel < size; pixel++)
 	{
-		msLEDHandler->mPixelStrip.SetPixelColor(pixel, updatedColor);
+        msLEDHandler->mPixelStrip.SetPixelColor(pixel, updatedColor);
 	}
 }
 
@@ -927,7 +954,7 @@ void LEDHandler::fadeInFadeOutRinseRepeat(uint8_t animIdx)
 	if (mAnimationStates[animIdx].fadeToColor)
 	{
 		mAnimationStates[animIdx].StartingColor =
-				mPixelStrip.GetPixelColor(mAnimationStates[animIdx].startLEDindex);
+                mPixelStrip.GetPixelColor(mAnimationStates[animIdx].startLEDindex);
 		mAnimationStates[animIdx].EndingColor =
 				mAnimationStates[animIdx].colors[mAnimationStates[animIdx].currentColorIdx];
 
@@ -960,7 +987,7 @@ void LEDHandler::blendInBlendOutRinseRepeat()
 
 	//get the current color and make the next color it blends to the next color in the array
 	mAnimationStates[BLEND_ANIMATION_IDX].StartingColor =
-			mPixelStrip.GetPixelColor(mAnimationStates[BLEND_ANIMATION_IDX].startLEDindex);
+            mPixelStrip.GetPixelColor(mAnimationStates[BLEND_ANIMATION_IDX].startLEDindex);
 
 	mAnimationStates[BLEND_ANIMATION_IDX].EndingColor =
 			mAnimationStates[BLEND_ANIMATION_IDX].colors[currentColor];
@@ -977,7 +1004,7 @@ void LEDHandler::processAnimationForNmillseconds(uint16_t nMilliseconds, uint8_t
 	if (mPixelAnimator.IsAnimationActive(animIdx))
 	{
 		mPixelAnimator.UpdateAnimations();
-		mPixelStrip.Show();
+        mPixelStrip.Show();
 	}
 	else
 	{
@@ -1012,7 +1039,7 @@ void LEDHandler::processAnimationForever(uint8_t startLED, uint8_t nLEDs, RgbCol
 	if (mPixelAnimator.IsAnimationActive(animIdx))
 	{
 		mPixelAnimator.UpdateAnimations();
-		mPixelStrip.Show();
+        mPixelStrip.Show();
 	}
 	else
 	{
@@ -1032,7 +1059,7 @@ void LEDHandler::processBlendedAnimationForever(uint8_t startLED, uint8_t nLEDs,
 	if (mPixelAnimator.IsAnimationActive(BLEND_ANIMATION_IDX))
 	{
 		mPixelAnimator.UpdateAnimations();
-		mPixelStrip.Show();
+        mPixelStrip.Show();
 	}
 	else
 	{
@@ -1056,7 +1083,7 @@ void LEDHandler::drawTailPixels()
 		float lightness = index * MAX_LIGHTNESS / LED_TAIL_LENGTH;
 		RgbColor color = HslColor(hue, 0.0f, lightness);  // white is (0, 0%, xx%)
 
-		mPixelStrip.SetPixelColor(index, NeoGamma<NeoGammaTableMethod>().Correct(color));
+        mPixelStrip.SetPixelColor(index, NeoGamma<NeoGammaTableMethod>().Correct(color));
 	}
 }
 

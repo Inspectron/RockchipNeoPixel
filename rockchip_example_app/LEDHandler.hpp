@@ -186,8 +186,9 @@ private:
 	// one entry per pixel to match the animation timing manager
 	LEDTypes::InspectronAnimationState* mAnimationStates;
 
-	NeoPixelBus<DotStarBgrFeature, DotStarSpi2MhzMethod> mPixelStrip;
+    NeoPixelBus<DotStarBgrFeature, DotStarSpi2MhzMethod> mPixelStrip;
 	NeoPixelAnimator mPixelAnimator;
+    RgbColor mColor;
 };
 
 #endif /* LEDHANDLER_HPP_ */
