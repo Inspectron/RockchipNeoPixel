@@ -3,7 +3,7 @@
 #define LEDHANDLER_HPP_
 
 #include <QObject>
-
+#include <QVector>
 #include "NeoPixelAnimator.h"
 #include "LEDTypes.h"
 
@@ -90,6 +90,12 @@ public:
 	LEDHandler();
 	virtual ~LEDHandler();
 
+public:
+    void setAllPixels(const RgbColor &color);
+    void setPixel(const int idx, const RgbColor &color);
+    void setPixelRange(const int startIdx, const int endIdx, const RgbColor &color);
+
+private:
     void setUpLights();
 	void determineLightState();
 
@@ -188,7 +194,7 @@ private:
 
     NeoPixelBus<DotStarBgrFeature, DotStarSpi2MhzMethod> mPixelStrip;
 	NeoPixelAnimator mPixelAnimator;
-    RgbColor mColor;
+    QVector<RgbColor> mPixels;
 };
 
 #endif /* LEDHANDLER_HPP_ */
