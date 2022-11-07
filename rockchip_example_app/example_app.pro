@@ -3,10 +3,12 @@ TARGET = exampleLEDapp
 SOURCES += \
     $$PWD/main.cpp \
     $$PWD/LEDHandler.cpp \
+    witorchledring.cpp
 
 HEADERS += \
     $$PWD/LEDHandler.hpp \
-    $$PWD/LEDTypes.h
+    $$PWD/LEDTypes.h \
+    witorchledring.hpp
 
 INCLUDEPATH  += ../src
 

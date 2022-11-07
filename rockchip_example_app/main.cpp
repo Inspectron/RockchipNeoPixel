@@ -3,6 +3,10 @@
 #include <QThread>
 #include "inspcore.hpp"
 #include "LEDHandler.hpp"
+#include "witorchledring.hpp"
+#include <QTimer>
+#include <QDebug>
+#include <QtConcurrent/QtConcurrent>
 
 using namespace LEDHANDLER;
 
@@ -35,6 +39,8 @@ int main()
     pLEDHandler->setLEDBatteryStatusState(eLED_BATTERY_CHARGING);
 
 #else
+
+#if 0
     LEDHandler *pLEDHandler = new LEDHandler();
     QThread *pThread = new QThread;
     pLEDHandler->moveToThread(pThread);
@@ -47,6 +53,44 @@ int main()
     //while(1){
     //    pLEDHandler->setUpLights();
     //}
+#endif
+
+    WiTorchLEDRing *pRing = new WiTorchLEDRing();
+    pRing->init();
+
+    qCritical() << "ring should be green";
+    pRing->setMode(WITORCH_LED_RING::eMODE_WIFI_HOTSPOT_CONNECTED);
+
+#if 0
+    QtConcurrent::run([&]()
+    {
+        QThread::sleep(5);
+        qCritical() << "ring should be green";
+        pRing->setMode(WITORCH_LED_RING::eMODE_WIFI_HOTSPOT_CONNECTED);
+    });
+
+    QtConcurrent::run([&]()
+    {
+        QThread::sleep(10);
+        qCritical() << "ring should be blue";
+        pRing->setMode(WITORCH_LED_RING::eMODE_WIFI_INFRASTRUCTURE_CONNECTED);
+    });
+#endif
+
+    QtConcurrent::run([&]()
+    {
+        QThread::sleep(5);
+        qCritical() << "try blink for zoom ";
+        pRing->blinkMicrophone();
+    });
+
+
+
+
+
+
+
+
 #endif
 
     while(1) { QThread::msleep(10); } // Dont do this

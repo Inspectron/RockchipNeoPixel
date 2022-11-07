@@ -3,7 +3,6 @@
 #include <QTimer>
 #include "LEDHandler.hpp"
 #include <QThread>
-#include <QtConcurrent/QtConcurrent>
 
 using namespace LEDTypes;
 using namespace LEDHANDLER;
@@ -14,6 +13,7 @@ namespace
     const uint16_t PIXEL_COUNT				= 19; // number of pixels on the LED ring
 
     //test vectors
+#if 0
     QVector<uint16_t> vec = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     QVector<uint16_t> vec1 = {6,7,8,9};
     QVector<uint16_t> vec2 = {15,16,17,18};
@@ -23,6 +23,7 @@ namespace
                                   COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_LIGHT_GREEN,COLOR_BLUE,COLOR_ORANGE};
     QVector<RgbColor> veccolor1 = {COLOR_RED,COLOR_BLUE,COLOR_GREEN,COLOR_PURPLE};
     QVector<RgbColor> veccolor2 = {COLOR_BLUE,COLOR_PURPLE,COLOR_LIGHT_GREEN,COLOR_RED};
+#endif
 
 	const uint8_t POWER_LED					=  7;   // PA7
 	const uint8_t LED_COB_LED_START_INDEX = 0;
@@ -102,10 +103,9 @@ LEDHandler::LEDHandler()
 , mAnimationStates(new InspectronAnimationState[NUM_ANIM_CHANNELS])
 , mPixelStrip(PIXEL_COUNT)
 , mPixelAnimator(NUM_ANIM_CHANNELS)
-, mColor(COLOR_GREEN)
+, mPixels()
 {
-
-    qCritical() << QThread::currentThreadId();
+    // set the static this pointer
 	if(msLEDHandler == NULL)
 	{
 		msLEDHandler = this;
@@ -131,22 +131,70 @@ LEDHandler::LEDHandler()
     mPixelStrip.Show();
     //mPixelAnimator.StartAnimation(1,10,loopAnimUpdate);//blue
 
-
-    QtConcurrent::run([&]
+    // init the pixels to black
+    for (int i = 0; i < PIXEL_COUNT; i++)
     {
-       while (1)
-       {
-           QThread::sleep(2);
-           mColor = (mColor == COLOR_GREEN ? COLOR_RED : COLOR_GREEN);
-           qDebug() << "set color to " << mColor.R << mColor.G << mColor.B;
-       }
-    });
-
-
+        mPixels.push_back(COLOR_BLACK);
+    }
 }
 
+/**
+ * @brief LEDHandler::~LEDHandler - dtor
+ */
 LEDHandler::~LEDHandler()
 {
+}
+
+/**
+ * @brief LEDHandler::setAllPixels - set all the pixels to one color
+ */
+void LEDHandler::setAllPixels(const RgbColor &color)
+{
+    for (int i = 0, sz = mPixels.size(); i < sz; i++)
+    {
+        mPixels[i] = color;
+    }
+}
+
+/**
+ * @brief LEDHandler::setPixel - set one pixel to the given color
+ * @param idx - pixel index
+ * @param color - color
+ */
+void LEDHandler::setPixel(const int idx, const RgbColor &color)
+{
+    if ( idx >=0 && idx < mPixels.size() )
+    {
+        mPixels[idx] = color;
+    }
+}
+
+/**
+ * @brief LEDHandler::setPixelRange - set a range of pixels to the given color
+ * @param startIdx - start pixel index
+ * @param endIdx - end pixel index
+ * @param color - color
+ */
+void LEDHandler::setPixelRange(const int startIdx, const int endIdx, const RgbColor &color)
+{
+    int numPixels = mPixels.size();
+
+    // validate start idx
+    if ( startIdx >= 0 && startIdx < numPixels )
+    {
+        // validate end idx
+        if (endIdx >= 0 && endIdx < numPixels)
+        {
+            // validate idx are in the correct order
+            if (endIdx >= startIdx)
+            {
+                for (int i = startIdx; i <= endIdx ; i++)
+                {
+                    mPixels[i] = color;
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -164,21 +212,20 @@ void LEDHandler::setUpLights()
 //Thread Function
 void LEDHandler::start()
 {
-    qDebug()<<"bye" ;
-    qCritical() << QThread::currentThreadId();
     mIsVideoCaptureInProgress = true;
 
-    qWarning() << __LINE__;
     while(mIsVideoCaptureInProgress)
     {
-        msLEDHandler->mPixelStrip.ClearTo(COLOR_BLACK);
-        msLEDHandler->setLed(vec1, msLEDHandler->mColor);
+        msLEDHandler->mPixelStrip.ClearTo(COLOR_BLACK);        
+        for (int i = 0, sz = mPixels.size(); i < sz; i++)
+        {
+            RgbColor color = msLEDHandler->mPixels.at(i);
+            msLEDHandler->mPixelStrip.SetPixelColor(i, color);
+        }
         QThread::msleep(1);
 
         msLEDHandler->mPixelStrip.Show();
     }
-
-    qWarning() << __LINE__;
 }
 
 void LEDHandler::stop()
@@ -1095,7 +1142,7 @@ void LEDHandler::loopAnimUpdate(const AnimationParam& param)
 	{
 		// done, time to restart this position tracking animation/timer
         msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
-        msLEDHandler->setLed(vec1,COLOR_BLUE);
+        // msLEDHandler->setLed(vec1,COLOR_BLUE); // DM: removed since the vec# isnt necessary
 
 	}
 }
@@ -1108,7 +1155,7 @@ void LEDHandler::loopAnimUpdate1(const AnimationParam& param)
     {
         // done, time to restart this position tracking animation/timer
         msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
-        msLEDHandler->setLed(vec2,COLOR_PURPLE);
+        //msLEDHandler->setLed(vec2,COLOR_PURPLE); // DM: removed since the vec# isnt necessary
     }
 }
 
@@ -1120,7 +1167,7 @@ void LEDHandler::loopAnimUpdate2(const AnimationParam& param)
     {
         // done, time to restart this position tracking animation/timer
         msLEDHandler->mPixelAnimator.RestartAnimation(param.index);
-        msLEDHandler->setLed(vec3,COLOR_ORANGE);
+        // msLEDHandler->setLed(vec3,COLOR_ORANGE); // DM: removed since the vec# isnt necessary
     }
 }
 
